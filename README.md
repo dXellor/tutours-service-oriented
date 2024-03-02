@@ -10,7 +10,7 @@ TODO
 * [Jelena Vujović](https://github.com/zanyaIO)
 * [Srđan Petronijević](https://github.com/srdjanpetronijevic)
 
-## Convetions
+## Conventions
 
 * [Git commits](https://www.conventionalcommits.org/en/v1.0.0/)
 * [GO](https://gochronicles.com/writing-go-code-like-a-pro/)
