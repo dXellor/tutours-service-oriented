@@ -5,10 +5,10 @@ TODO
 
 ## Authors
 
+* [Nikola Simić](https://github.com/dXellor)
 * [Anastasija Radić](https://github.com/anastasijaradic)
 * [Jelena Vujović](https://github.com/zanyaIO)
 * [Srđan Petronijević](https://github.com/srdjanpetronijevic)
-* [Nikola Simić](https://github.com/dXellor)
 
 ## Convetions
 
