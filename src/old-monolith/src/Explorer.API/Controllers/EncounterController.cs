@@ -4,6 +4,7 @@ using Explorer.Encounters.API.Public;
 using Explorer.Encounters.Core.Domain;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos;
+using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,6 +16,10 @@ namespace Explorer.API.Controllers
     public class EncounterController : BaseApiController
     {
         private readonly IEncounterService _encounterService;
+        private static HttpClient encounterHttpClient = new()
+        {
+            BaseAddress = new Uri("http://localhost:7007"),
+        };
 
         public EncounterController(IEncounterService encounterService)
         {
@@ -23,9 +28,16 @@ namespace Explorer.API.Controllers
 
 
         [HttpGet]
-        public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize)
+        public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize) // treating like getALl for now
         {
-            var result = _encounterService.GetApproved(page, pageSize);
+            //var result = _encounterService.GetApproved(page, pageSize);
+            //return CreateResponse(result);
+
+            // conversion bad, I can't
+            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
+            var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
+            var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
+
             return CreateResponse(result);
         }
 
