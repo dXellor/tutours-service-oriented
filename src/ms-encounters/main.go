@@ -31,6 +31,7 @@ func main() {
 	router := encounterHandler.InitRouter(&encounterService)
 	fmt.Println("Encounters micro-service running")
 	http.ListenAndServe(":7007", router)
+
 }
 
 func loadConfig() {

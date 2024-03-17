@@ -30,15 +30,15 @@ namespace Explorer.API.Controllers
         [HttpGet]
         public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize) // treating like getALl for now
         {
-            //var result = _encounterService.GetApproved(page, pageSize);
-            //return CreateResponse(result);
+            var result = _encounterService.GetApproved(page, pageSize);
+            return CreateResponse(result);
 
             // conversion bad, I can't
-            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
-            var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
-            var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
+            //var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
+            //var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
+            //var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
 
-            return CreateResponse(result);
+            //return CreateResponse(result);
         }
 
         [HttpPost]
