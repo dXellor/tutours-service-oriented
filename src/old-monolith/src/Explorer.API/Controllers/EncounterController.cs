@@ -8,6 +8,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Diagnostics.Metrics;
 
 namespace Explorer.API.Controllers
 {
@@ -30,36 +31,50 @@ namespace Explorer.API.Controllers
         [HttpGet]
         public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize) // treating like getALl for now
         {
-            var result = _encounterService.GetApproved(page, pageSize);
-            return CreateResponse(result);
+            //var result = _encounterService.GetApproved(page, pageSize);
 
+            // need some better protection when service is down
             // conversion bad, I can't
-            //var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
-            //var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
-            //var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
+            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
+            var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
+            var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
 
-            //return CreateResponse(result);
+            return CreateResponse(result);
         }
 
         [HttpPost]
         public ActionResult<EncounterDto> Create([FromBody] EncounterDto encounter)
         {
             encounter.UserId = User.PersonId();
-            var result = _encounterService.Create(encounter);
+            //var result = _encounterService.Create(encounter);
+
+            var response = encounterHttpClient.PostAsJsonAsync<EncounterDto>("/", encounter).Result;
+            var encounterDto = response.Content.ReadFromJsonAsync<EncounterDto>().Result;
+            var result = Result.Ok<EncounterDto>(encounterDto);
+
             return CreateResponse(result);
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<EncounterDto> Update([FromBody] EncounterDto encounter)
+        public ActionResult<EncounterDto> Update(int id, [FromBody] EncounterDto encounter)
         {
-            var result = _encounterService.Update(encounter);
+            //var result = _encounterService.Update(encounter);
+
+            var response = encounterHttpClient.PutAsJsonAsync<EncounterDto>($"/{id}", encounter).Result;
+            var encounterDto = response.Content.ReadFromJsonAsync<EncounterDto>().Result;
+            var result = Result.Ok<EncounterDto>(encounterDto);
+
             return CreateResponse(result);
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var result = _encounterService.Delete(id);
+            //var result = _encounterService.Delete(id);
+
+            var response = encounterHttpClient.DeleteAsync($"/{id}").Result;
+            var result = Result.Ok();
+
             return CreateResponse(result);
         }
 
