@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"tutours/soa/ms-encounters/dataservice"
 	"tutours/soa/ms-encounters/model"
+	"tutours/soa/ms-encounters/model/enum"
 )
 
 type EncounterService struct {
@@ -53,4 +54,46 @@ func (encounterService *EncounterService) Delete(id int) error {
 		return fmt.Errorf("error")
 	}
 	return nil
+}
+
+func (encounterService *EncounterService) GetApprovedByStatus(status enum.EncounterStatus) ([]model.Encounter, error) {
+	encounter, err := encounterService.encounterRepository.GetApprovedByStatus(status)
+	if err != nil {
+		return nil, fmt.Errorf("error")
+	}
+	return encounter, nil
+}
+
+func (encounterService *EncounterService) GetByUser(userId int) ([]model.Encounter, error) {
+	encounter, err := encounterService.encounterRepository.GetByUser(userId)
+	if err != nil {
+		return nil, fmt.Errorf("error")
+	}
+	return encounter, nil
+}
+
+func (encounterService *EncounterService) GetTouristCreatedEncounters() ([]model.Encounter, error) {
+	encounter, err := encounterService.encounterRepository.GetTouristCreatedEncounters()
+	if err != nil {
+		return nil, fmt.Errorf("error")
+	}
+	return encounter, nil
+}
+
+func (encounterService *EncounterService) Approve(encounter *model.Encounter) (*model.Encounter, error) {
+	encounter.ApprovalStatus = enum.ADMIN_APPROVED
+	li, err := encounterService.encounterRepository.Update(encounter)
+	if err != nil {
+		return nil, fmt.Errorf("error")
+	}
+	return &li, nil
+}
+
+func (encounterService *EncounterService) Decline(encounter *model.Encounter) (*model.Encounter, error) {
+	encounter.ApprovalStatus = enum.DECLINED
+	li, err := encounterService.encounterRepository.Update(encounter)
+	if err != nil {
+		return nil, fmt.Errorf("error")
+	}
+	return &li, nil
 }
