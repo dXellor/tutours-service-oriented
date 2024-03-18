@@ -81,7 +81,7 @@ func (encounterService *EncounterService) GetTouristCreatedEncounters() ([]model
 }
 
 func (encounterService *EncounterService) Approve(encounter *model.Encounter) (*model.Encounter, error) {
-	encounter.ApprovalStatus = enum.ADMIN_APPROVED
+	encounter.Approve()
 	li, err := encounterService.encounterRepository.Update(encounter)
 	if err != nil {
 		return nil, fmt.Errorf("error")
@@ -90,7 +90,7 @@ func (encounterService *EncounterService) Approve(encounter *model.Encounter) (*
 }
 
 func (encounterService *EncounterService) Decline(encounter *model.Encounter) (*model.Encounter, error) {
-	encounter.ApprovalStatus = enum.DECLINED
+	encounter.Decline()
 	li, err := encounterService.encounterRepository.Update(encounter)
 	if err != nil {
 		return nil, fmt.Errorf("error")

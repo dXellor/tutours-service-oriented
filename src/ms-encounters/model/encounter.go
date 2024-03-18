@@ -19,3 +19,11 @@ type Encounter struct {
 	ImageLatitude  float64
 	ImageLongitude float64
 }
+
+func (e *Encounter) Approve() {
+	e.ApprovalStatus = enum.ADMIN_APPROVED
+}
+
+func (e *Encounter) Decline() {
+	e.ApprovalStatus = enum.DECLINED
+}
