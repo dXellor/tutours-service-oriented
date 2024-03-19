@@ -40,7 +40,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
   touristPosition: TouristPosition | undefined;
   routeQuery: RouteQuery | undefined;
   currentPosition: MarkerPosition | undefined;
-  
+
   refreshMap: boolean = false;
   currentKeyPoint: Keypoint | undefined;
 
@@ -75,10 +75,10 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
 
   public nearbyObjectsToShow: PointOfInterestType[];
   public get PointOfInterestType() {
-    return PointOfInterestType; 
+    return PointOfInterestType;
   }
   public get EncounterType() {
-    return EncounterType; 
+    return EncounterType;
   }
 
   public activeTab: string;
@@ -95,7 +95,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
     this.positionSetMode = true;
     this.openImagePopup = false;
     this.activeTab = 'activeTour';
-    this.nearbyObjectsToShow = [ 
+    this.nearbyObjectsToShow = [
       PointOfInterestType.publicObjects ,
       PointOfInterestType.activeEncounters,
       PointOfInterestType.completedEncounters,
@@ -113,7 +113,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
     }, 1000);
 
     setTimeout(() => {
-      this.loadPointsOfInterest(); 
+      this.loadPointsOfInterest();
       this.loadMapInfo();
     }, 6000);
     // this.updateSubscription = interval(10000).pipe(
@@ -129,7 +129,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
 
     //     // temporary, will be changed after currentPosition update:
     //     setTimeout(() => {
-    //       this.loadPointsOfInterest(); 
+    //       this.loadPointsOfInterest();
     //       this.loadMapInfo();
     //     }, 2000);
     //   }
@@ -137,9 +137,9 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
   }
 
   triggerMapRefresh(): void {
-    this.refreshMap = false; 
+    this.refreshMap = false;
     setTimeout(() => {
-      this.refreshMap = true; 
+      this.refreshMap = true;
     });
   }
 
@@ -250,7 +250,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
     this.completedEncounters = [];
     this.notStartedEncounters = [];
 
-    this.encounterService.getNearbyEncounters().subscribe({
+    this.encounterService.getEncounters().subscribe({
       next: (encountersResult: PagedResults<Encounter>) => {
         this.nearbyEncounters = encountersResult.results;
         var encounterIds = encountersResult.results.map((enc) => enc.id);
@@ -424,7 +424,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
         }
         this.getKeypointActiveEncounters();
       },
-      error: () => { 
+      error: () => {
         this.getPosition();
       }
     })
@@ -446,11 +446,11 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
 
   showBlogForm(status: TourExecutionStatus): void{
     if(status === 'COMPLETED')
-    {            
+    {
       this.showBlog = confirm("Would you like create a blog?");
     }
   }
- 
+
   toggleSetting(setting: PointOfInterestType) {
     const settingIndex = this.nearbyObjectsToShow.indexOf(setting);
     if(settingIndex > -1) {
@@ -460,7 +460,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
       this.nearbyObjectsToShow.push(setting);
     }
 
-    this.loadPointsOfInterest(); 
+    this.loadPointsOfInterest();
     this.loadMapInfo();
   }
 
@@ -474,7 +474,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
 
   getPosition(): void {
     this.service.getTouristPosition().subscribe({
-      next: (result: TouristPosition) => { 
+      next: (result: TouristPosition) => {
         this.touristPosition = result;
         this.currentPosition = {
           latitude: this.touristPosition.latitude,
@@ -482,7 +482,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
         }
         this.mode = 'edit';
       },
-      error: () => { 
+      error: () => {
         this.mode = 'add';
       }
     });
@@ -493,7 +493,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
       latitude: event[0],
       longitude: event[1]
     }
-    
+
     this.confirmPosition();
   }
 
@@ -515,7 +515,7 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
 
           // sadsadkhasudhasu
           setTimeout(() => {
-            this.loadPointsOfInterest(); 
+            this.loadPointsOfInterest();
             this.loadMapInfo();
           }, 1000);
 
@@ -529,14 +529,14 @@ export class ActiveTourComponent implements OnInit, OnDestroy {
     else if (this.mode ==='add') {
       this.service.addTouristPosition(this.touristPosition).subscribe({
         next: () => {
-          window.alert("Position successfully added");  
+          window.alert("Position successfully added");
           this.mode = 'edit';
 
           this.service.updateSocialEncounters().subscribe({
             next: () => {
           }
           });
-          
+
         },
       });
     }

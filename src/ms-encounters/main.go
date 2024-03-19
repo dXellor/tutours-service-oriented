@@ -31,9 +31,11 @@ func main() {
 	encounterService.Init(&encounterRepository)
 	encounterStatsService := encounterservice.EncounterStatsService{}
 	encounterStatsService.Init(&encounterCompletionRepository)
+	encounterCompletionService := encounterservice.EncounterComlpetionService{}
+	encounterCompletionService.Init(&encounterCompletionRepository)
 	encounterHandler := handler.EncounterHandler{}
 
-	router := encounterHandler.InitRouter(&encounterService, &encounterStatsService)
+	router := encounterHandler.InitRouter(&encounterService, &encounterStatsService, &encounterCompletionService)
 	fmt.Println("Encounters micro-service running")
 	http.ListenAndServe(":7007", router)
 

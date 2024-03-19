@@ -32,3 +32,10 @@ type IEncounterStatsService interface {
 	GetEncounterStatsByUser(userId int) (*dto.EncounterStats, error)
 	GetEncounterYearStatsByUser(userId int, year int) (*dto.EncounterYearStats, error)
 }
+
+type IEncounterCompletionService interface {
+	Init(crudRepository dataservice.IEncounterCompletionRepository)
+	GetByUser(userId int) ([]model.EncounterCompletion, error)
+	StartEncounter(userId int, encounter *model.Encounter) (*model.EncounterCompletion, error)
+	FinishEncounter(userId int, encounter *model.Encounter) (*model.EncounterCompletion, error)
+}
