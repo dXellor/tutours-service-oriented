@@ -3,6 +3,7 @@ package usecase
 import (
 	"tutours/soa/ms-encounters/dataservice"
 	"tutours/soa/ms-encounters/model"
+	"tutours/soa/ms-encounters/model/dto"
 	"tutours/soa/ms-encounters/model/enum"
 )
 
@@ -18,9 +19,16 @@ type ICRUDService interface {
 type IEncounterService interface {
 	ICRUDService
 	Init(crudRepository dataservice.IEncounterRepository)
-	GetApprovedByStatus(status enum.EncounterStatus) ([]model.Encounter, error) 
+	GetApprovedByStatus(status enum.EncounterStatus) ([]model.Encounter, error)
 	GetByUser(userId int) ([]model.Encounter, error)
 	GetTouristCreatedEncounters() ([]model.Encounter, error)
 	Approve(encounter *model.Encounter) (*model.Encounter, error)
 	Decline(encounter *model.Encounter) (*model.Encounter, error)
+}
+
+type IEncounterStatsService interface {
+	// ICRUDService
+	Init(crudRepository dataservice.IEncounterCompletionRepository)
+	GetEncounterStatsByUser(userId int) (*dto.EncounterStats, error)
+	GetEncounterYearStatsByUser(userId int, year int) (*dto.EncounterYearStats, error)
 }
