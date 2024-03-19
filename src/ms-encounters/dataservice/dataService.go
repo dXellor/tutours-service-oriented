@@ -28,6 +28,12 @@ type IEncounterCompletionRepository interface {
 	// ICRUDRepository
 	Init(databaseConnection *gorm.DB)
 
+	GetByUser(userId int) ([]model.EncounterCompletion, error)
+	Create(encounterCompletion *model.EncounterCompletion) (model.EncounterCompletion, error)
+	Update(encounterCompletion *model.EncounterCompletion) (model.EncounterCompletion, error)
+	GetByUserAndEncounter(userId int, encounterId int) (*model.EncounterCompletion, error)
+	HasUserStartedEncounter(userId int, encounterId int) bool
+
 	GetCompletedCountByUser(userId int) (int64, error)
 	GetFailedCountByUser(userId int) (int64, error)
 	GetCompletedCountByUserAndMonth(userId int, month int, year int) (int64, error)

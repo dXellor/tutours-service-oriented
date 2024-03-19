@@ -13,7 +13,10 @@ namespace Explorer.API.Controllers.Tourist.Encounters
     public class EncounterCompletionController : BaseApiController
     {
         private readonly IEncounterCompletionService _encounterCompletionService;
-
+        private static HttpClient _encounterHttpClient = new()
+        {
+            BaseAddress = new Uri("http://localhost:7007"),
+        };
         public EncounterCompletionController(IEncounterCompletionService encounterCompletionService)
         {
             _encounterCompletionService = encounterCompletionService;
@@ -23,7 +26,11 @@ namespace Explorer.API.Controllers.Tourist.Encounters
         public ActionResult<PagedResult<EncounterCompletionDto>> GetPagedByUser([FromQuery] int page, [FromQuery] int pageSize)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var result = _encounterCompletionService.GetPagedByUser(page, pageSize, userId);
+            //var result = _encounterCompletionService.GetPagedByUser(page, pageSize, userId);
+            var encounterCompletionsDto = _encounterHttpClient.GetFromJsonAsync<List<EncounterCompletionDto>>($"/encounterCompletions/{userId}").Result;
+            var pagedResult = new PagedResult<EncounterCompletionDto>(encounterCompletionsDto, encounterCompletionsDto.Count);
+            var result = Result.Ok(pagedResult);
+
             return CreateResponse(result);
         }
 
@@ -45,14 +52,20 @@ namespace Explorer.API.Controllers.Tourist.Encounters
         public ActionResult<EncounterCompletionDto> StartEncounter([FromBody] EncounterDto encounter)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var result = _encounterCompletionService.StartEncounter(userId, encounter);
+            // var result = _encounterCompletionService.StartEncounter(userId, encounter);
+            var response = _encounterHttpClient.PostAsJsonAsync($"/startEncounter/{userId}", encounter).Result;
+            var encounterDto = response.Content.ReadFromJsonAsync<EncounterCompletionDto>().Result;
+            var result = Result.Ok<EncounterCompletionDto>(encounterDto);
             return CreateResponse(result);
         }
         [HttpPut("finishEncounter")]
         public ActionResult<EncounterCompletionDto> FinishEncounter([FromBody] EncounterDto encounter)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var result = _encounterCompletionService.FinishEncounter(userId, encounter);
+            // var result = _encounterCompletionService.FinishEncounter(userId, encounter);
+            var response = _encounterHttpClient.PutAsJsonAsync($"/finishEncounter/{userId}", encounter).Result;
+            var encounterDto = response.Content.ReadFromJsonAsync<EncounterCompletionDto>().Result;
+            var result = Result.Ok<EncounterCompletionDto>(encounterDto);
             return CreateResponse(result);
         }
 

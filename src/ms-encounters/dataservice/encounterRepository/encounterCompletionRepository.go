@@ -15,6 +15,45 @@ func (encounterCompletionRepository *EncounterCompletionRepository) Init(databas
 	encounterCompletionRepository.databaseConnection = databaseConnection
 }
 
+func (encounterCompletionRepository *EncounterCompletionRepository) GetByUser(userId int) ([]model.EncounterCompletion, error) {
+	var encounterCompletions = []model.EncounterCompletion{}
+	dbResult := encounterCompletionRepository.databaseConnection.Preload("Encounter").Find(&encounterCompletions, "\"UserId\"=?", userId)
+	if dbResult != nil {
+		return encounterCompletions, dbResult.Error
+	}
+	return encounterCompletions, nil
+}
+
+func (encounterCompletionRepository *EncounterCompletionRepository) Create(encounterCompletion *model.EncounterCompletion) (model.EncounterCompletion, error) {
+	dbResult := encounterCompletionRepository.databaseConnection.Create(encounterCompletion)
+	if dbResult != nil {
+		return *encounterCompletion, dbResult.Error
+	}
+	return *encounterCompletion, nil
+}
+
+func (encounterCompletionRepository *EncounterCompletionRepository) Update(encounterCompletion *model.EncounterCompletion) (model.EncounterCompletion, error) {
+	dbResult := encounterCompletionRepository.databaseConnection.Save(encounterCompletion)
+	if dbResult != nil {
+		return *encounterCompletion, dbResult.Error
+	}
+	return *encounterCompletion, nil
+}
+
+func (encounterCompletionRepository *EncounterCompletionRepository) HasUserStartedEncounter(userId int, encounterId int) bool {
+	encounterCompletion, _ := encounterCompletionRepository.GetByUserAndEncounter(userId, encounterId)
+	return encounterCompletion != nil
+}
+
+func (encounterCompletionRepository *EncounterCompletionRepository) GetByUserAndEncounter(userId int, encounterId int) (*model.EncounterCompletion, error) {
+	var encounterCompletion = model.EncounterCompletion{}
+	dbResult := encounterCompletionRepository.databaseConnection.Find(&encounterCompletion, "\"UserId\"=? AND \"EncounterId\"=?", userId, encounterId)
+	if dbResult != nil {
+		return &encounterCompletion, dbResult.Error
+	}
+	return &encounterCompletion, nil
+}
+
 // Statistics
 func (encounterCompletionRepository *EncounterCompletionRepository) GetCompletedCountByUser(userId int) (int64, error) {
 	var completedCount int64
