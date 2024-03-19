@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"tutours/soa/ms-encounters/model"
@@ -13,11 +14,13 @@ import (
 )
 
 type EncounterHandler struct {
-	encounterService usecase.IEncounterService
+	encounterService      usecase.IEncounterService
+	encounterStatsService usecase.IEncounterStatsService
 }
 
-func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterService) *chi.Mux {
+func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterService, encounterStatsService usecase.IEncounterStatsService) *chi.Mux {
 	handler.encounterService = encounterService
+	handler.encounterStatsService = encounterStatsService
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -36,6 +39,10 @@ func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterS
 
 	router.Put("/approve", handler.Approve)
 	router.Put("/decline", handler.Decline)
+
+	//Statistics
+	router.Get("/completions/{userId}", handler.StatsCompletions)
+	router.Get("/yearCompletions/{userId}", handler.StatsYearCompletions)
 
 	return router
 }
@@ -60,7 +67,7 @@ func (handler *EncounterHandler) Get(writer http.ResponseWriter, reader *http.Re
 	}
 	writer.WriteHeader(http.StatusOK)
 	writer.Header().Set("Content-Type", "application/json")
-	if(encounter.Id != 0) { // find better way, lazy
+	if encounter.Id != 0 { // find better way, lazy
 		json.NewEncoder(writer).Encode(encounter)
 	}
 }
@@ -180,4 +187,31 @@ func (handler *EncounterHandler) Decline(writer http.ResponseWriter, reader *htt
 	writer.WriteHeader(http.StatusOK)
 	writer.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(writer).Encode(updatedEncounter)
+}
+
+func (handler *EncounterHandler) StatsCompletions(writer http.ResponseWriter, reader *http.Request) {
+	var id, _ = strconv.Atoi(chi.URLParam(reader, "userId"))
+	encounterStats, err := handler.encounterStatsService.GetEncounterStatsByUser(id)
+	if err != nil {
+		writer.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	fmt.Println(id)
+	writer.WriteHeader(http.StatusOK)
+	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(encounterStats)
+}
+
+func (handler *EncounterHandler) StatsYearCompletions(writer http.ResponseWriter, reader *http.Request) {
+	var id, _ = strconv.Atoi(chi.URLParam(reader, "userId"))
+	var year, _ = strconv.Atoi(reader.URL.Query().Get("year"))
+	encounterYearStats, err := handler.encounterStatsService.GetEncounterYearStatsByUser(id, year)
+	if err != nil {
+		writer.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	fmt.Println(id)
+	writer.WriteHeader(http.StatusOK)
+	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(encounterYearStats)
 }

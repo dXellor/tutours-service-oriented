@@ -24,11 +24,16 @@ func main() {
 
 	encounterRepository := encounterrepository.EncounterRepository{}
 	encounterRepository.Init(database)
+	encounterCompletionRepository := encounterrepository.EncounterCompletionRepository{}
+	encounterCompletionRepository.Init(database)
+
 	encounterService := encounterservice.EncounterService{}
-	encounterService.Init(&encounterRepository);
+	encounterService.Init(&encounterRepository)
+	encounterStatsService := encounterservice.EncounterStatsService{}
+	encounterStatsService.Init(&encounterCompletionRepository)
 	encounterHandler := handler.EncounterHandler{}
-	
-	router := encounterHandler.InitRouter(&encounterService)
+
+	router := encounterHandler.InitRouter(&encounterService, &encounterStatsService)
 	fmt.Println("Encounters micro-service running")
 	http.ListenAndServe(":7007", router)
 
@@ -54,7 +59,7 @@ func initDB() *gorm.DB {
 	connectionUrl := fmt.Sprintf("%s://%s:%s@%s:%s/%s", dbType, dbUser, dbSecret, dbHost, dbPort, dbName)
 	database, databaseErr := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{NamingStrategy: schema.NamingStrategy{
 		NoLowerCase: true,
-	  }})
+	}})
 	if databaseErr != nil {
 		log.Fatalf(databaseErr.Error())
 		return nil

@@ -17,7 +17,7 @@ namespace Explorer.API.Controllers
     public class EncounterController : BaseApiController
     {
         private readonly IEncounterService _encounterService;
-        private static HttpClient encounterHttpClient = new()
+        private static HttpClient _encounterHttpClient = new()
         {
             BaseAddress = new Uri("http://localhost:7007"),
         };
@@ -35,7 +35,7 @@ namespace Explorer.API.Controllers
 
             // need some better protection when service is down
             // conversion bad, I can't
-            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
+            var encounterDto = _encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/all").Result;
             var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
             var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
 
@@ -48,7 +48,7 @@ namespace Explorer.API.Controllers
             encounter.UserId = User.PersonId();
             //var result = _encounterService.Create(encounter);
 
-            var response = encounterHttpClient.PostAsJsonAsync<EncounterDto>("/", encounter).Result;
+            var response = _encounterHttpClient.PostAsJsonAsync<EncounterDto>("/", encounter).Result;
             var encounterDto = response.Content.ReadFromJsonAsync<EncounterDto>().Result;
             var result = Result.Ok<EncounterDto>(encounterDto);
 
@@ -60,7 +60,7 @@ namespace Explorer.API.Controllers
         {
             //var result = _encounterService.Update(encounter);
 
-            var response = encounterHttpClient.PutAsJsonAsync<EncounterDto>($"/{id}", encounter).Result;
+            var response = _encounterHttpClient.PutAsJsonAsync<EncounterDto>($"/{id}", encounter).Result;
             var encounterDto = response.Content.ReadFromJsonAsync<EncounterDto>().Result;
             var result = Result.Ok<EncounterDto>(encounterDto);
 
@@ -72,7 +72,7 @@ namespace Explorer.API.Controllers
         {
             //var result = _encounterService.Delete(id);
 
-            var response = encounterHttpClient.DeleteAsync($"/{id}").Result;
+            var response = _encounterHttpClient.DeleteAsync($"/{id}").Result;
             var result = Result.Ok();
 
             return CreateResponse(result);
@@ -83,7 +83,7 @@ namespace Explorer.API.Controllers
         {
             //var result = _encounterService.GetApprovedByStatus(page, pageSize, status);
 
-            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>($"/status?status={status}").Result;
+            var encounterDto = _encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>($"/status?status={status}").Result;
             var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
             var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
 
@@ -112,7 +112,7 @@ namespace Explorer.API.Controllers
             //var result = _encounterService.GetByUser(page, pageSize, ClaimsPrincipalExtensions.PersonId(User));
 
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>($"/byUser/{userId}").Result;
+            var encounterDto = _encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>($"/byUser/{userId}").Result;
             var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
             var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
 
@@ -124,7 +124,7 @@ namespace Explorer.API.Controllers
         public ActionResult<EncounterDto> Approve(EncounterDto encounter)
         {
             //var result = _encounterService.Approve(encounter);
-            var response = encounterHttpClient.PutAsJsonAsync<EncounterDto>("/approve", encounter).Result;
+            var response = _encounterHttpClient.PutAsJsonAsync<EncounterDto>("/approve", encounter).Result;
             var encounterDto = response.Content.ReadFromJsonAsync<EncounterDto>().Result;
             var result = Result.Ok<EncounterDto>(encounterDto);
 
@@ -136,7 +136,7 @@ namespace Explorer.API.Controllers
         public ActionResult<EncounterDto> Decline(EncounterDto encounter)
         {
             //var result = _encounterService.Decline(encounter);
-            var response = encounterHttpClient.PutAsJsonAsync<EncounterDto>("/decline", encounter).Result;
+            var response = _encounterHttpClient.PutAsJsonAsync<EncounterDto>("/decline", encounter).Result;
             var encounterDto = response.Content.ReadFromJsonAsync<EncounterDto>().Result;
             var result = Result.Ok<EncounterDto>(encounterDto);
 
@@ -148,7 +148,7 @@ namespace Explorer.API.Controllers
         {
             //var result = _encounterService.GetTouristCreatedEncounters(page, pageSize);
 
-            var encounterDto = encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/touristCreatedEncounters").Result;
+            var encounterDto = _encounterHttpClient.GetFromJsonAsync<List<EncounterDto>>("/touristCreatedEncounters").Result;
             var pagedResult = new PagedResult<EncounterDto>(encounterDto, encounterDto.Count);
             var result = Result.Ok<PagedResult<EncounterDto>>(pagedResult);
 
