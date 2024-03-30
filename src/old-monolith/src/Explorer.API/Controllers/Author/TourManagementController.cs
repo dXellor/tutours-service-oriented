@@ -76,10 +76,10 @@ public class TourManagementController : BaseApiController
 
     [HttpGet("author")]
     [Authorize(Roles = "author")]
-    public ActionResult<PagedResult<TourDto>> GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
+    public IActionResult GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
     {
         var authorId = ClaimsPrincipalExtensions.PersonId(User);
-        var response = _tourHttpClient.GetFromJsonAsync<TourDto[]>($"/{authorId}").Result;
+        var response = _tourHttpClient.GetFromJsonAsync<TourDto[]>($"/author/{authorId}").Result;
         var result = Result.Ok<TourDto[]>(response);
         return CreateResponse(result);
     }

@@ -56,6 +56,7 @@ func (tourService *TourService) Delete(id int) error {
 }
 
 func (tourService *TourService) GetByAuthor(authorId int) ([]model.Tour, error) {
+	fmt.Println("Called byAuthor()")
 	tours, error := tourService.tourRepository.GetByAuthor(authorId)
 	if error != nil {
 		fmt.Println("error")

@@ -31,4 +31,4 @@ VALUES
     (6, 'Ovčar-Kablar Gorge', 'Explore the breathtaking views of Ovčar-Kablar Gorge.', 1800, 32, 8, 2, 3, 1, '2024-02-16', ARRAY['nature', 'adventure']),
     (7, 'Subotica Heritage Tour', 'Discover the architectural wonders of Subotica.', 1600, 32, 8, 2, 3, 1, '2024-01-13', ARRAY['heritage', 'architecture', 'Subotica']),
     (8, 'Kragujevac History Walk', 'Walk through the history of Kragujevac.', 1400, 8, 2, 2, 3, 1, '2024-03-19', ARRAY['history', 'walk', 'Kragujevac']),
-    (9, 'Uvac Nature Expedition', 'Experience the stunning nature of Uvac.', 1800, 16, 2, 2, 3, 1, '2024-03-24', ARRAY['nature', 'expedition', 'Uvac']);
+    (16, 'Uvac Nature Expedition', 'Experience the stunning nature of Uvac.', 1800, 16, 2, 2, 3, 1, '2024-03-24', ARRAY['nature', 'expedition', 'Uvac']);

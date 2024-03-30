@@ -29,7 +29,7 @@ func (handler *TourHandler) InitRouter(tourService usecase.ITourService) *chi.Mu
 	router.Put("/{id}", handler.Update)
 	router.Delete("/{id}", handler.Delete)
 
-	router.Get("/author/{authorId}", handler.Get)
+	router.Get("/author/{authorId}", handler.GetByAuthor)
 	router.Get("/published", handler.GetPublished)
 	router.Get("/published/{authorId}", handler.GetPublishedByAuthor)
 
