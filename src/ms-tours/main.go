@@ -25,10 +25,17 @@ func main() {
 	tourRepository := tourrepository.TourRepository{}
 	tourRepository.Init(database)
 
+	keypointRepository := tourrepository.KeypointRepository{}
+	keypointRepository.Init(database)
+
 	tourService := tourservice.TourService{}
 	tourService.Init(&tourRepository)
 
+	keypointService := tourservice.KeypointService{}
+	keypointService.Init(&keypointRepository)
+
 	tourhandler := handler.TourHandler{}
+	//KeypointHandler := handler.KeypointHandler{}
 
 	router := tourhandler.InitRouter(&tourService)
 

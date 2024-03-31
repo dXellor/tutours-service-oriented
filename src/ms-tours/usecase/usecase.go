@@ -20,3 +20,12 @@ type ITourService interface {
 	GetPublished() ([]model.Tour, error)
 	GetPublishedByAuthor(authorId int) ([]model.Tour, error)
 }
+
+type IKeypointService interface {
+	Init(crudRepository dataservice.IKeypointRepository)
+	GetAll() ([]model.Keypoint, error)
+	Create(keypoint *model.Keypoint) (*model.Keypoint, error)
+	Delete(id int) error
+	Update(id int, keypoint *model.Keypoint) (*model.Keypoint, error)
+	GetByTour(tourId int) ([]model.Keypoint, error)
+}
