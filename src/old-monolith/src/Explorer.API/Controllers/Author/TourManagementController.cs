@@ -28,7 +28,9 @@ public class TourManagementController : BaseApiController
     [Authorize(Roles = "author, tourist")]
     public ActionResult<PagedResult<TourDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
     {
-        var result = _tourService.GetPaged(page, pageSize);
+        var response = _tourHttpClient.GetFromJsonAsync<List<TourDto>>($"/").Result;
+        var pagedResult = new PagedResult<TourDto>(response, response.Count);
+        var result = Result.Ok(response);
         return CreateResponse(result);
     }
 
@@ -37,7 +39,8 @@ public class TourManagementController : BaseApiController
     [Authorize(Roles = "author")]
     public ActionResult<TourDto> GetById([FromRoute] int tourId)
     {
-        var result = _tourService.Get(tourId);
+        var response = _tourHttpClient.GetFromJsonAsync<TourDto[]>($"/{tourId}").Result;
+        var result = Result.Ok<TourDto[]>(response);
         return CreateResponse(result);
     }
 
@@ -79,8 +82,9 @@ public class TourManagementController : BaseApiController
     public IActionResult GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
     {
         var authorId = ClaimsPrincipalExtensions.PersonId(User);
-        var response = _tourHttpClient.GetFromJsonAsync<TourDto[]>($"/author/{authorId}").Result;
-        var result = Result.Ok<TourDto[]>(response);
+        var response = _tourHttpClient.GetFromJsonAsync<List<TourDto>>($"/author/{authorId}").Result;
+        var pagedResult = new PagedResult<TourDto>(response, response.Count);
+        var result = Result.Ok(pagedResult);
         return CreateResponse(result);
     }
 

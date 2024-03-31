@@ -7,7 +7,6 @@ import (
 	"tutours/soa/ms-tours/model/enum"
 )
 
-// Tour represents a tour model.
 type Tour struct {
 	Id               int `gorm:"primary_key;auto_increment"`
 	UserId           int
@@ -23,7 +22,7 @@ type Tour struct {
 	Tags             []string `gorm:"-"`
 }
 
-func (t *Tour) Scan(value interface{}) error {
+func (tour *Tour) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}
@@ -32,13 +31,13 @@ func (t *Tour) Scan(value interface{}) error {
 		return nil
 	}
 	tags := strings.Split(strings.Trim(str, "{}"), ",")
-	t.Tags = tags
+	tour.Tags = tags
 	return nil
 }
 
-func (t Tour) Value() (driver.Value, error) {
-	if len(t.Tags) == 0 {
+func (tour Tour) Value() (driver.Value, error) {
+	if len(tour.Tags) == 0 {
 		return nil, nil
 	}
-	return "{" + strings.Join(t.Tags, ",") + "}", nil
+	return "{" + strings.Join(tour.Tags, ",") + "}", nil
 }
