@@ -25,12 +25,20 @@ func main() {
 	tourRepository := tourrepository.TourRepository{}
 	tourRepository.Init(database)
 
+	keypointRepository := tourrepository.KeypointRepository{}
+	keypointRepository.Init(database)
+
 	tourService := tourservice.TourService{}
 	tourService.Init(&tourRepository)
 
+	keypointService := tourservice.KeypointService{}
+	keypointService.Init(&keypointRepository)
+
 	tourhandler := handler.TourHandler{}
+	keypointHandler := handler.KeypointHandler{}
 
 	router := tourhandler.InitRouter(&tourService)
+	router = keypointHandler.InitRouter(&keypointService, router)
 
 	fmt.Println("Tours micro-service running")
 	http.ListenAndServe(":7007", router)

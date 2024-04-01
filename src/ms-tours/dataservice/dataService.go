@@ -21,3 +21,12 @@ type ITourRepository interface {
 	GetPublished() ([]model.Tour, error)
 	GetPublishedByAuthor(authorId int) ([]model.Tour, error)
 }
+
+type IKeypointRepository interface {
+	Init(databaseConnection *gorm.DB)
+	GetAll() ([]model.Keypoint, error)
+	Create(keypoint *model.Keypoint) (model.Keypoint, error)
+	Delete(id int) error
+	Update(tour *model.Keypoint) (model.Keypoint, error)
+	GetByTour(tourId int) ([]model.Keypoint, error)
+}
