@@ -60,6 +60,7 @@ public class TourManagementController : BaseApiController
     [Authorize(Roles = "author,tourist")]
     public ActionResult<TourDto> Update(int id, [FromBody] TourDto tour)
     {
+        tour.UserId = ClaimsPrincipalExtensions.PersonId(User);
         var response = _tourHttpClient.PutAsJsonAsync<TourDto>($"/{id}", tour).Result;
         var tourDto = response.Content.ReadFromJsonAsync<TourDto>().Result;
         var result = Result.Ok<TourDto>(tourDto);

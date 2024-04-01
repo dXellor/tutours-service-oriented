@@ -67,12 +67,22 @@ func (tourRepository *TourRepository) GetByAuthor(authorId int) ([]model.Tour, e
 }
 
 func (tourRepository *TourRepository) GetPublished() ([]model.Tour, error) {
-	var tour = []model.Tour{}
-	dbResult := tourRepository.databaseConnection.Find(&tour, "\"Status\"=?", enum.PUBLISHED)
-	if dbResult != nil {
-		return tour, dbResult.Error
+	var tours []model.Tour
+	dbResult := tourRepository.databaseConnection.Find(&tours, "\"Status\"=?", enum.PUBLISHED)
+	if dbResult == nil {
+		return nil, dbResult.Error
 	}
-	return tour, nil
+
+	for i := range tours {
+		var keypoints []model.Keypoint
+		dbResult := tourRepository.databaseConnection.Where("\"TourId\"=?", tours[i].Id).Find(&keypoints)
+		if dbResult == nil {
+			return nil, dbResult.Error
+		}
+		tours[i].Keypoints = keypoints
+	}
+
+	return tours, nil
 }
 
 func (tourRepository *TourRepository) GetPublishedByAuthor(authorId int) ([]model.Tour, error) {
