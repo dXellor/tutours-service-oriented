@@ -35,9 +35,10 @@ func main() {
 	keypointService.Init(&keypointRepository)
 
 	tourhandler := handler.TourHandler{}
-	//KeypointHandler := handler.KeypointHandler{}
+	keypointHandler := handler.KeypointHandler{}
 
 	router := tourhandler.InitRouter(&tourService)
+	router = keypointHandler.InitRouter(&keypointService, router)
 
 	fmt.Println("Tours micro-service running")
 	http.ListenAndServe(":7007", router)

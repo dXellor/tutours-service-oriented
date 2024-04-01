@@ -31,7 +31,7 @@ public class KeypointController : BaseApiController
     {
         //var result = _keypointService.GetPaged(page, pageSize);
 
-        var keypointDto = _keypointHttpClient.GetFromJsonAsync<List<KeypointDto>>("/all").Result;
+        var keypointDto = _keypointHttpClient.GetFromJsonAsync<List<KeypointDto>>("/keyPoint/all").Result;
         var pagedResult = new PagedResult<KeypointDto>(keypointDto, keypointDto.Count);
         var result = Result.Ok<PagedResult<KeypointDto>>(pagedResult);
 
@@ -44,8 +44,12 @@ public class KeypointController : BaseApiController
     {
         //var result = _keypointService.GetByTourId(page, pageSize, tourId);
 
-        var response = _keypointHttpClient.GetFromJsonAsync<KeypointDto[]>($"/tour/{tourId}").Result;
-        var result = Result.Ok<KeypointDto[]>(response);
+        //var response = _keypointHttpClient.GetFromJsonAsync<KeypointDto>($"/tour/{tourId}").Result;
+        //var result = Result.Ok<KeypointDto>(response);
+
+        var keypointDto = _keypointHttpClient.GetFromJsonAsync<List<KeypointDto>>($"/keyPoint/tour/{tourId}").Result;
+        var pagedResult = new PagedResult<KeypointDto>(keypointDto, keypointDto.Count);
+        var result = Result.Ok<PagedResult<KeypointDto>>(pagedResult);
 
         return CreateResponse(result);
     }
@@ -55,7 +59,7 @@ public class KeypointController : BaseApiController
     {
         //var result = _keypointService.Create(keypoint);
 
-        var response = _keypointHttpClient.PostAsJsonAsync<KeypointDto>("/", keypoint).Result;
+        var response = _keypointHttpClient.PostAsJsonAsync<KeypointDto>("/keyPoint/", keypoint).Result;
         var keypointDto = response.Content.ReadFromJsonAsync<KeypointDto>().Result;
         var result = Result.Ok<KeypointDto>(keypointDto);
 
@@ -73,8 +77,9 @@ public class KeypointController : BaseApiController
     public ActionResult<KeypointDto> Update([FromBody] KeypointDto keypoint)
     {
         //var result = _keypointService.Update(keypoint);
+        int id = keypoint.Id;
 
-        var response = _keypointHttpClient.PutAsJsonAsync<KeypointDto>("/", keypoint).Result;
+        var response = _keypointHttpClient.PutAsJsonAsync<KeypointDto>($"/keyPoint/{id}", keypoint).Result;
         var keypointDto = response.Content.ReadFromJsonAsync<KeypointDto>().Result;
         var result = Result.Ok<KeypointDto>(keypointDto);
 
@@ -86,7 +91,7 @@ public class KeypointController : BaseApiController
     {
         //var result = _keypointService.Delete(id);
 
-        var response = _keypointHttpClient.DeleteAsync($"/{id}").Result;
+        var response = _keypointHttpClient.DeleteAsync($"/keyPoint/{id}").Result;
         var result = Result.Ok();
 
         return CreateResponse(result);

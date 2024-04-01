@@ -48,9 +48,10 @@ func (keypointRepository *KeypointRepository) Delete(id int) error {
 }
 
 func (keypointRepository *KeypointRepository) GetByTour(tourId int) ([]model.Keypoint, error) {
+
 	var keypoints = []model.Keypoint{}
 	dbResult := keypointRepository.databaseConnection.Find(&keypoints, "\"TourId\"=?", tourId)
-	if dbResult != nil {
+	if dbResult.Error != nil {
 		return keypoints, dbResult.Error
 	}
 	return keypoints, nil

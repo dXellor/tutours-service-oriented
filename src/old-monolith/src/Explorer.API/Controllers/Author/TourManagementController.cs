@@ -39,8 +39,8 @@ public class TourManagementController : BaseApiController
     [Authorize(Roles = "author")]
     public ActionResult<TourDto> GetById([FromRoute] int tourId)
     {
-        var response = _tourHttpClient.GetFromJsonAsync<TourDto[]>($"/{tourId}").Result;
-        var result = Result.Ok<TourDto[]>(response);
+        var response = _tourHttpClient.GetFromJsonAsync<TourDto>($"/{tourId}").Result;
+        var result = Result.Ok<TourDto>(response);
         return CreateResponse(result);
     }
 

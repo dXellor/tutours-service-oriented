@@ -2,32 +2,28 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"tutours/soa/ms-tours/model"
 	"tutours/soa/ms-tours/usecase"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 )
 
 type KeypointHandler struct {
 	keypointService usecase.IKeypointService
 }
 
-func (handler *KeypointHandler) InitRouter(keypointService usecase.IKeypointService) *chi.Mux {
+func (handler *KeypointHandler) InitRouter(keypointService usecase.IKeypointService, router *chi.Mux) *chi.Mux {
 	handler.keypointService = keypointService
 
-	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-
-	router.Get("/all", handler.GetAll)
-	router.Get("/", handler.GetAll)
-	router.Post("/", handler.Create)
-	router.Put("/{id}", handler.Update)
-	router.Delete("/{id}", handler.Delete)
-	router.Get("/tour/{tourId}", handler.GetByTour)
+	router.Get("/keyPoint/all", handler.GetAll)
+	router.Get("/keyPoint/", handler.GetAll)
+	router.Post("/keyPoint/", handler.Create)
+	router.Put("/keyPoint/{id}", handler.Update)
+	router.Delete("/keyPoint/{id}", handler.Delete)
+	router.Get("/keyPoint/tour/{tourId}", handler.GetByTour)
 
 	return router
 }
@@ -62,6 +58,7 @@ func (handler *KeypointHandler) Create(writer http.ResponseWriter, reader *http.
 
 func (handler *KeypointHandler) Update(writer http.ResponseWriter, reader *http.Request) {
 	var id, _ = strconv.Atoi(chi.URLParam(reader, "id"))
+	fmt.Println("ID:", id)
 	var keypoint model.Keypoint
 	err := json.NewDecoder(reader.Body).Decode(&keypoint)
 	if err != nil {
