@@ -12,8 +12,8 @@ import { RouteInfo } from 'src/app/shared/model/routeInfo.model';
   templateUrl: './tour-form.component.html',
   styleUrls: ['./tour-form.component.css']
 })
-export class TourFormComponent implements OnChanges, OnInit{  
-  
+export class TourFormComponent implements OnChanges, OnInit{
+
   public tour: Tour;
   public tourForm: FormGroup;
   public tourId: number;
@@ -24,7 +24,7 @@ export class TourFormComponent implements OnChanges, OnInit{
   @Output() selectedKeypointChanged = new EventEmitter<Keypoint>();
 
   constructor(private tourAuthoringService: TourAuthoringService, private router: Router, private route: ActivatedRoute) {
-    this.tour = { description: '', difficulty: TourDifficulty.EASY, status: Status.DRAFT, name: '', price: 0, transportType: TransportType.WALK, userId: 0, id:0}
+    this.tour = { description: '', difficulty: TourDifficulty.EASY, status: Status.DRAFT, name: '', price: 0, transportType: TransportType.WALK, userId: 0, id: 0, tags: [] };
     this.tourForm = new FormGroup({
       name: new FormControl('', [Validators.required]),
       description: new FormControl(''),
@@ -42,8 +42,9 @@ export class TourFormComponent implements OnChanges, OnInit{
         if(this.tourId !== 0){
           this.tourAuthoringService.getTourById(this.tourId).subscribe((res: Tour) => {
             this.tour = res;
+            this.tour.tags = this.tour.tags || [];
             this.tourForm.patchValue(this.tour);
-            
+
             this.getTourKeypoints();
           });
         }
@@ -71,7 +72,7 @@ export class TourFormComponent implements OnChanges, OnInit{
       tour.price = 0;
       tour.statusUpdateTime = new Date();
       this.tourAuthoringService.addTour(tour).subscribe({
-        next: (newTour) => { 
+        next: (newTour) => {
           window.alert("You have successfuly saved your tour");
           this.router.navigate(
             ['/tour-management', newTour.id]
@@ -91,7 +92,7 @@ export class TourFormComponent implements OnChanges, OnInit{
       tour.distance = this.tour.distance;
       tour.duration = this.tour.duration;
       this.tourAuthoringService.updateTour(tour).subscribe({
-        next: (updatedTour) => { 
+        next: (updatedTour) => {
           window.alert("You have successfuly saved your tour");
           this.tour = updatedTour;
           this.routeQuery = {
@@ -100,7 +101,7 @@ export class TourFormComponent implements OnChanges, OnInit{
           }
         }
       });
-    } 
+    }
   }
 
   getTourKeypoints(): void{
@@ -126,7 +127,7 @@ export class TourFormComponent implements OnChanges, OnInit{
       this.tour.distance = event.distance;
 
       this.tourAuthoringService.updateTour(this.tour).subscribe({
-        next: (updatedTour) => { 
+        next: (updatedTour) => {
           this.tour = updatedTour;
         }
       });
@@ -135,8 +136,9 @@ export class TourFormComponent implements OnChanges, OnInit{
 
   addTag(): void {
     if(!this.tourForm.value.newTag) return;
-
+    console.log(this.tourForm.value.newTag)
     this.tour.tags?.push(this.tourForm.value.newTag);
+    console.log(this.tour.tags)
     this.tourForm.patchValue({newTag: ''});
   }
 

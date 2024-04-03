@@ -19,8 +19,8 @@ type Tour struct {
 	TransportType    enum.TransportType  `json:",string"`
 	Status           enum.TourStatus     `json:",string"`
 	StatusUpdateTime time.Time
-	Tags             []string   `gorm:"-"`
-	Keypoints        []Keypoint // New field to hold keypoints
+	Tags             []string `gorm:"-"`
+	Keypoints        []Keypoint
 }
 
 func (tour *Tour) Scan(value interface{}) error {
