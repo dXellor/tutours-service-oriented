@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  servers:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: ms_tours_server
+    container_name: ms_tours_server
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 7007:7007
+    depends_on:
+      - database
+  
+  database:
+    image: postgres
+    container_name: postgresql
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tours
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    
+
+volumes:
+  database-data:
+    name: server-database
+
+networks:
+  servers:
+    name: servers
+    driver: bridge

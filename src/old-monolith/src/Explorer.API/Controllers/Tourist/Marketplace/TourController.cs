@@ -13,6 +13,11 @@ namespace Explorer.API.Controllers.Tourist.Marketplace;
 public class TourController : BaseApiController
 {
     private readonly ITourService _tourService;
+    
+    private static HttpClient _tourHttpClient = new()
+    {
+        BaseAddress = new Uri("http://localhost:7007"),
+    };
 
     public TourController(ITourService tourService)
     {
@@ -31,7 +36,9 @@ public class TourController : BaseApiController
     public ActionResult<PagedResult<TourDto>> GetArchivedAndPublishedPaged([FromQuery] int page,
         [FromQuery] int pageSize)
     {
-        var result = _tourService.GetArchivedAndPublishedPaged(page, pageSize);
+        var response = _tourHttpClient.GetFromJsonAsync<List<TourDto>>($"/published").Result;
+        var pagedResult = new PagedResult<TourDto>(response, response.Count);
+        var result = Result.Ok(pagedResult);
         return CreateResponse(result);
     }
     
