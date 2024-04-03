@@ -17,7 +17,6 @@ import (
 )
 
 func main() {
-	loadConfig()
 
 	database := initDB()
 	populateDB(database)
