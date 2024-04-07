@@ -20,7 +20,7 @@ services:
       DATABASE_NAME: encounters
     depends_on:
       - ms-encounters-database
-  
+
   ms-encounters-database:
     image: postgres
     container_name: postgresql-encounters
@@ -35,7 +35,6 @@ services:
       POSTGRES_DB: encounters
     volumes:
       - database-data:/var/lib/postgresql/data
-    
 
 volumes:
   database-data:
