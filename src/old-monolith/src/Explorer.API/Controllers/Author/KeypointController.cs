@@ -18,7 +18,7 @@ public class KeypointController : BaseApiController
     private readonly IKeypointService _keypointService;
     private static HttpClient _keypointHttpClient = new()
     {
-        BaseAddress = new Uri("http://localhost:7007"),
+        BaseAddress = new Uri("http://ms-tours:7007"),
     };
 
     public KeypointController(IKeypointService keypointService)
