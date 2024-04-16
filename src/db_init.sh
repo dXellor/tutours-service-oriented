@@ -20,3 +20,9 @@ if [ -n "$POSTGRES_MULTIPLE_DATABASES" ]; then
     done
     echo "Multiple databases created"
 fi
+
+echo "$(pwd)"
+
+psql -U postgres explorer < docker-entrypoint-initdb.d/explorer-init-data.sql
+psql -U postgres tours < docker-entrypoint-initdb.d/tours.sql
+psql -U postgres encounters < docker-entrypoint-initdb.d/encounters.sql

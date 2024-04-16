@@ -73,9 +73,12 @@ services:
       POSTGRES_MULTIPLE_DATABASES: explorer,encounters,tours
     volumes:
       - ./db_init.sh:/docker-entrypoint-initdb.d/db_init.sh
-      - type: bind
-        source: ./explorer-init-data.sql
-        target: /tmp/explorer-init.sql
+      - ./old-monolith/scripts/tutours-db-backup.sql:/docker-entrypoint-initdb.d/explorer-init-data.sql
+      - ./ms-tours/script/tours.sql:/docker-entrypoint-initdb.d/tours.sql
+      - ./ms-encounters/script/encounters.sql:/docker-entrypoint-initdb.d/encounters.sql
+      # - type: bind
+      #   source: ./explorer-init-data.sql
+      #   target: /tmp/explorer-init.sql
     ports:
       - "5432:5432"
 
@@ -112,7 +115,7 @@ services:
   #     - database-data:/var/lib/postgresql/data
 
 volumes:
-  database-data:
+  soadb:
     name: explorer
 
 networks:
