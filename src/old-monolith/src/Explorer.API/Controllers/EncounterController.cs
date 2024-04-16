@@ -19,7 +19,7 @@ namespace Explorer.API.Controllers
         private readonly IEncounterService _encounterService;
         private static HttpClient _encounterHttpClient = new()
         {
-            BaseAddress = new Uri("http://localhost:7007"),
+            BaseAddress = new Uri("http://ms-encounters:7007"),
         };
 
         public EncounterController(IEncounterService encounterService)
