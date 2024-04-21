@@ -17,4 +17,5 @@ public interface IProfileService
     Result<bool> CanTouristCreateEncounters(long touristId);
     Result<PersonDto> Get(long userId);
     Result<PersonDto> GetFull(long userId);
+    Result<List<PersonDto>> GetPersonsFromIds(IEnumerable<int> ids);
 }
