@@ -39,6 +39,15 @@ class FollowerService():
             userToBeFollowedId=userToBeFollowedId,
         )
 
+    def get_followers(self, signedInUserId: int):
+        records, summary, keys = self.driver.execute_query(
+            "MATCH (u:USER {id: $userId})<-[:FOLLOWS]-(u2:USER) RETURN collect(u2.id)",
+            database_= self.db_name,
+            userId=signedInUserId
+        )
+
+        return records
+
     def get_followings(self, signedInUserId: int):
         records, summary, keys = self.driver.execute_query(
             "MATCH (u:USER {id: $userId})-[:FOLLOWS]->(u2:USER) RETURN collect(u2.id)",

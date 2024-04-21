@@ -20,4 +20,4 @@ app = FastAPI(
     version="v1",
     lifespan=lifespan)
 
-app.include_router(router, prefix='/api/v1/followers', tags=['followers'])
+app.include_router(router, prefix='/api/v1', tags=['followers'])
