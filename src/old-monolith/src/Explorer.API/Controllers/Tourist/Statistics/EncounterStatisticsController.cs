@@ -16,7 +16,7 @@ namespace Explorer.API.Controllers.Tourist.Statistics
         private readonly IStatisticsService _statisticsService;
         private static HttpClient _encounterHttpClient = new()
         {
-            BaseAddress = new Uri("http://localhost:7007"),
+            BaseAddress = new Uri("http://ms-encounters:7007"),
         };
         
         public EncounterStatisticsController(IStatisticsService statisticsService)

@@ -16,7 +16,7 @@ public class TourController : BaseApiController
     
     private static HttpClient _tourHttpClient = new()
     {
-        BaseAddress = new Uri("http://localhost:7007"),
+        BaseAddress = new Uri("http://ms-tours:7007"),
     };
 
     public TourController(ITourService tourService)
