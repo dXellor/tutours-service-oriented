@@ -15,7 +15,7 @@ public class ProfileController : BaseApiController
     private readonly IProfileService _profileService;
     private static HttpClient _followerHttpClient = new()
     {
-        BaseAddress = new Uri("http://localhost:8000"),
+        BaseAddress = new Uri("http://ms-followers:8000"),
     };
     
     public ProfileController(IProfileService profileService)
@@ -91,8 +91,9 @@ public class ProfileController : BaseApiController
     {
         try
         {
-            var result = _profileService.Unfollow(User.PersonId(), unfollowedId);
-            return CreateResponse(result);
+            var response = _followerHttpClient.PostAsJsonAsync<object>($"/api/v1/unfollow/{User.PersonId()}/{unfollowedId}", null).Result;
+            // var result = _profileService.Unfollow(User.PersonId(), unfollowedId);
+            return CreateResponse(Result.Ok());
         }
         catch (ArgumentException e)
         {

@@ -23,10 +23,13 @@ async def test_endpoint():
 async def follow(userId1: int, userId2: int):
     follower_service.follow(userId1, userId2)
 
+@router.post('/unfollow/{userId1}/{userId2}')
+async def unfollow(userId1: int, userId2: int):
+    follower_service.unfollow(userId1, userId2)
+
 @router.get('/followers/{userId}')
 async def get_followings(userId: int):
     return follower_service.get_followers(userId)
-
 
 @router.get('/followings/{userId}')
 async def get_followings(userId: int):

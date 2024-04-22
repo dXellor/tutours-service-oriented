@@ -40,6 +40,14 @@ class FollowerService():
             userToBeFollowedId=userToBeFollowedId,
         )
 
+    def unfollow(self, signedInUserId: int, userToBeUnfollowedId: int) -> None:
+        self.driver.execute_query(
+            "MATCH (signedInUser:USER {id: $signedInUserId})-[r:FOLLOWS]->(userToBeUnfollowed:USER{id: $userToBeUnfollowedId}) DELETE r",
+            database_= self.db_name,
+            signedInUserId=signedInUserId,
+            userToBeUnfollowedId=userToBeUnfollowedId,
+        )
+
     def get_followers(self, signedInUserId: int):
         records, summary, keys = self.driver.execute_query(
             "MATCH (u:USER {id: $userId})<-[:FOLLOWS]-(u2:USER) RETURN collect(u2.id)",
