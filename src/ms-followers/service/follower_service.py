@@ -1,5 +1,6 @@
 import logging
 from neo4j import GraphDatabase
+from neo4j import Record
 
 class FollowerService():
 
@@ -46,7 +47,7 @@ class FollowerService():
             userId=signedInUserId
         )
 
-        return records
+        return records[0][0]
 
     def get_followings(self, signedInUserId: int):
         records, summary, keys = self.driver.execute_query(
@@ -55,7 +56,7 @@ class FollowerService():
             userId=signedInUserId
         )
 
-        return records
+        return records[0][0]
     
     def get_recommendations(self, signedInUserId: int):
         records, summary, keys = self.driver.execute_query(
@@ -67,6 +68,6 @@ class FollowerService():
             userId=signedInUserId
         )
 
-        return records
+        return records[0][0]
 
         

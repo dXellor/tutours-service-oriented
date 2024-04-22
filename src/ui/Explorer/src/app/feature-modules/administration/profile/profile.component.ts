@@ -1,6 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Profile } from '../model/profile.model';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ProfileService } from '../profile.service';
 import { ActivatedRoute } from '@angular/router';
 import { PagedResults } from 'src/app/shared/model/paged-results.model';
@@ -9,7 +14,7 @@ import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 @Component({
   selector: 'xp-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  styleUrls: ['./profile.component.css'],
 })
 export class ProfileComponent implements OnInit {
   showContent = 'showProfile';
@@ -19,7 +24,7 @@ export class ProfileComponent implements OnInit {
   //showProfileSection: boolean = true;  // Initially show profile section
   //showEditProfileSection: boolean = true;  // Initially show edit profile section
   showForm: boolean = false;
-  
+
   editActive: boolean = true;
   chatActive: boolean = false;
   followingActive: boolean = false;
@@ -40,9 +45,14 @@ export class ProfileComponent implements OnInit {
     email: '',
     userId: 0,
     xp: 0,
-    level: 0
-  }
-  constructor(private cd: ChangeDetectorRef, private service: ProfileService, private auth: AuthService, private formBuilder: FormBuilder) {
+    level: 0,
+  };
+  constructor(
+    private cd: ChangeDetectorRef,
+    private service: ProfileService,
+    private auth: AuthService,
+    private formBuilder: FormBuilder
+  ) {
     this.personUpdateForm = this.formBuilder.group({
       newName: new FormControl('', Validators.required),
       newSurname: new FormControl('', Validators.required),
@@ -52,7 +62,7 @@ export class ProfileComponent implements OnInit {
       username: new FormControl('', Validators.required),
       password: new FormControl('', Validators.required),
       email: new FormControl('', Validators.required),
-      userId: 0
+      userId: 0,
     });
   }
 
@@ -79,7 +89,7 @@ export class ProfileComponent implements OnInit {
           },
           error: (err: any) => {
             console.log(err);
-          }
+          },
         });
       }
     });
@@ -91,23 +101,23 @@ export class ProfileComponent implements OnInit {
 
   loadProfileFollowers() {
     this.service.getFollowers().subscribe({
-      next: (data: PagedResults<Profile>) => {
-        this.followers = data.results;
+      next: (data: Profile[]) => {
+        this.followers = data;
       },
       error: (err: any) => {
         console.log(err);
-      }
+      },
     });
   }
 
   loadProfileFollowing() {
     this.service.getFollowing().subscribe({
-      next: (data: PagedResults<Profile>) => {
-        this.following = data.results;
+      next: (data: Profile[]) => {
+        this.following = data;
       },
       error: (err: any) => {
         console.log(err);
-      }
+      },
     });
   }
 
@@ -118,39 +128,37 @@ export class ProfileComponent implements OnInit {
       },
       error: (err: any) => {
         console.log(err);
-      }
+      },
     });
   }
 
-  
   activeSection: string = 'showEdit';
 
-  showTable(show:string) :void {
+  showTable(show: string): void {
     this.activeSection = show;
   }
-  
 
   unfollow(followingId: number) {
     this.service.unfollow(followingId).subscribe({
       next: (data: PagedResults<Profile>) => {
-        this.following = data.results;
+        // this.following = data.results;
         this.getProfiles();
       },
       error: (err: any) => {
         console.log(err);
-      }
+      },
     });
   }
 
   follow(followingId: number) {
     this.service.follow(followingId).subscribe({
       next: (data: PagedResults<Profile>) => {
-        this.following = data.results;
+        // this.following = data.results;
         this.getProfiles();
       },
       error: (err: any) => {
         console.log(err);
-      }
+      },
     });
   }
 
@@ -170,7 +178,7 @@ export class ProfileComponent implements OnInit {
             email: this.personUpdateForm.value.email,
             userId: user.id,
             xp: this.profile.xp,
-            level: this.profile.level
+            level: this.profile.level,
           };
           this.service.updateProfile(userId, updatedProfile).subscribe({
             next: (data: Profile) => {
@@ -180,18 +188,18 @@ export class ProfileComponent implements OnInit {
             },
             error: (err: any) => {
               console.log(err);
-            }
+            },
           });
         }
       });
     }
   }
 
-  showUpdateForm() : void {
+  showUpdateForm(): void {
     this.updateProfile = true;
   }
 
-  cancelUpdate() : void {
+  cancelUpdate(): void {
     this.updateProfile = false;
   }
 }

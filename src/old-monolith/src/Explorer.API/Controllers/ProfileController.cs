@@ -51,7 +51,6 @@ public class ProfileController : BaseApiController
         // var result = _profileService.GetFollowers(User.PersonId());
         var result = _profileService.GetPersonsFromIds(response);
         return CreateResponse(result);
-        return CreateResponse(result);
     }
 
     [HttpGet("following")]

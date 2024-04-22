@@ -47,4 +47,9 @@ public abstract class BaseService<TDto, TDomain> where TDomain : Entity
         var items = result.Value.Results.Select(_mapper.Map<TDto>).ToList();
         return new PagedResult<TDto>(items, result.Value.TotalCount);
     }
+    
+    protected Result<List<TDto>> MapToDto(List<TDomain> results)
+    {
+        return results.Select(_mapper.Map<TDto>).ToList();
+    }
 }
