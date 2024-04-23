@@ -68,7 +68,7 @@ class FollowerService():
     
     def get_recommendations(self, signedInUserId: int):
         records, summary, keys = self.driver.execute_query(
-            """MATCH (u1:USER {id: 1})-[:FOLLOWS]->(u2:USER)-[:FOLLOWS]->(u3:USER) 
+            """MATCH (u1:USER {id: $userId})-[:FOLLOWS]->(u2:USER)-[:FOLLOWS]->(u3:USER) 
             WHERE u1 <> u3 
             AND NOT (u1)-[:FOLLOWS]->(u3) 
             RETURN collect(u3.id)""",
