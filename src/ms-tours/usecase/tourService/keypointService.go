@@ -2,56 +2,62 @@ package tourservice
 
 import (
 	"fmt"
-	"tutours/soa/ms-tours/dataservice"
-
+	TourRepository "tutours/soa/ms-tours/dataservice/tourRepository"
 	"tutours/soa/ms-tours/model"
 )
 
 type KeypointService struct {
-	keypointRepository dataservice.IKeypointRepository
+	KeypointRepository *TourRepository.KeypointRepository
 }
 
-func (keypointService *KeypointService) Init(keypointRepository dataservice.IKeypointRepository) {
-	keypointService.keypointRepository = keypointRepository
-}
-
-func (keypointService *KeypointService) GetAll() ([]model.Keypoint, error) {
-	keypoints, err := keypointService.keypointRepository.GetAll()
+func (service *KeypointService) Get(id int) (model.Keypoint, error) {
+	var keypoint model.Keypoint
+	keypoint, err := service.KeypointRepository.Get(id)
 	if err != nil {
-		return nil, fmt.Errorf("error")
+		return keypoint, err
+	}
+	return keypoint, nil
+}
+
+func (service *KeypointService) GetAll() ([]model.Keypoint, error) {
+	keypoints, err := service.KeypointRepository.GetAll()
+	if err != nil {
+		return nil, err
 	}
 	return keypoints, nil
 }
 
-func (keypointService *KeypointService) Create(keypoint *model.Keypoint) (*model.Keypoint, error) {
-	createdKeypoint, err := keypointService.keypointRepository.Create(keypoint)
+func (service *KeypointService) GetByTour(tourId int) ([]model.Keypoint, error) {
+	keypoints, err := service.KeypointRepository.GetByTour(tourId)
 	if err != nil {
-		return nil, fmt.Errorf("error")
+		return nil, fmt.Errorf("failed to retrieve keypoints for tour with id %d: %w", tourId, err)
 	}
-	return &createdKeypoint, nil
+	if len(keypoints) == 0 {
+		return []model.Keypoint{}, nil
+	}
+	return keypoints, nil
 }
 
-func (keypointService *KeypointService) Update(id int, keypoint *model.Keypoint) (*model.Keypoint, error) {
-	keypoint.Id = id
-	li, err := keypointService.keypointRepository.Update(keypoint)
+func (service *KeypointService) Create(kp *model.Keypoint) (*model.Keypoint, error) {
+	keypoint, err := service.KeypointRepository.Create(kp)
 	if err != nil {
-		return nil, fmt.Errorf("error")
+		return nil, fmt.Errorf(err.Error())
 	}
-	return &li, nil
+	return &keypoint, nil
 }
 
-func (keypointService *KeypointService) Delete(id int) error {
-	err := keypointService.keypointRepository.Delete(id)
+func (service *KeypointService) Delete(id int) error {
+	err := service.KeypointRepository.Delete(id)
 	if err != nil {
-		return fmt.Errorf("error")
+		return err
 	}
 	return nil
 }
 
-func (keypointService *KeypointService) GetByTour(tourId int) ([]model.Keypoint, error) {
-	keypoints, error := keypointService.keypointRepository.GetByTour(tourId)
-	if error != nil {
-		fmt.Println("error")
+func (service *KeypointService) Update(keypoint *model.Keypoint) (model.Keypoint, error) {
+	updatedKeypoint, err := service.KeypointRepository.Update(keypoint)
+	if err != nil {
+		return updatedKeypoint, err
 	}
-	return keypoints, nil
+	return updatedKeypoint, nil
 }
