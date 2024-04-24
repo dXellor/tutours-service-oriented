@@ -2,14 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	"io"
 	"time"
 	"tutours/soa/ms-tours/model/enum"
 )
 
 type Tour struct {
-	Id               int                 `gorm:"primary_key;auto_increment"`
-	AuthorId         int                 `gorm:"not null"`
+	Id               int                 `bson:"_id,omitempty" json:"id"`
+	AuthorId         int                 `bson:"authorId,omitempty" json:"authorId"`
 	Name             string              `bson:"name" json:"name"`
 	Description      string              `bson:"description" json:"description"`
 	Price            float64             `bson:"price" json:"price"`
@@ -23,19 +22,69 @@ type Tour struct {
 	Keypoints        []Keypoint
 }
 
-type Tours []*Tour
+func (k *Tour) UnmarshalJSON(data []byte) error {
 
-func (p *Tours) ToJSON(w io.Writer) error {
-	e := json.NewEncoder(w)
-	return e.Encode(p)
+	var temp struct {
+		Id               int
+		AuthorId         int
+		Name             string
+		Description      string
+		Price            float64
+		Duration         int
+		Distance         float64
+		Difficulty       enum.TourDifficulty
+		TransportType    enum.TransportType
+		Status           enum.TourStatus
+		StatusUpdateTime time.Time
+		Tags             []string
+	}
+
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	k.Id = temp.Id
+	k.AuthorId = temp.AuthorId
+	k.Name = temp.Name
+	k.Price = temp.Price
+	k.Duration = temp.Duration
+	k.Description = temp.Description
+	k.Distance = temp.Distance
+	k.Difficulty = temp.Difficulty
+	k.TransportType = temp.TransportType
+	k.Status = temp.Status
+	k.StatusUpdateTime = temp.StatusUpdateTime
+	k.Tags = temp.Tags
+
+	return nil
 }
 
-func (p *Tour) ToJSON(w io.Writer) error {
-	e := json.NewEncoder(w)
-	return e.Encode(p)
-}
-
-func (p *Tour) FromJSON(r io.Reader) error {
-	d := json.NewDecoder(r)
-	return d.Decode(p)
+func (k *Tour) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Id               int
+		AuthorId         int
+		Name             string
+		Description      string
+		Price            float64
+		Duration         int
+		Distance         float64
+		Difficulty       enum.TourDifficulty
+		TransportType    enum.TransportType
+		Status           enum.TourStatus
+		StatusUpdateTime time.Time
+		Tags             []string
+	}{
+		Id:               k.Id,
+		AuthorId:         k.AuthorId,
+		Name:             k.Name,
+		Price:            k.Price,
+		Duration:         k.Duration,
+		Description:      k.Description,
+		Distance:         k.Distance,
+		Difficulty:       k.Difficulty,
+		TransportType:    k.TransportType,
+		Status:           k.Status,
+		StatusUpdateTime: k.StatusUpdateTime,
+		Tags:             k.Tags,
+	})
 }

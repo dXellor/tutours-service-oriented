@@ -17,7 +17,7 @@ func InsertInfo(client *mongo.Client) {
 	defer cancel()
 
 	// Access the "tourService" database and "tours" collection.
-	toursDatabase := client.Database("tourService")
+	toursDatabase := client.Database("tours")
 	// Retrieve the list of collections in the database.
 	collections, err := toursDatabase.ListCollectionNames(ctx, bson.D{})
 	if err != nil {

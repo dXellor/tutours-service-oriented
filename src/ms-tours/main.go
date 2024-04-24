@@ -15,15 +15,13 @@ import (
 func main() {
 	app.Init()
 	client := app.InitDB()
-	storeLogger := log.New(os.Stdout, "[patient-store] ", log.LstdFlags)
+	storeLogger := log.New(os.Stdout, "[tours-database] ", log.LstdFlags)
 	app.InsertInfo(client)
 
 	// Tours setup
-	/*
-		tourRepo := &tour.TourRepository{Cli: client, Logger: storeLogger}
-		tourService := &service.TourService{TourRepository: tourRepo}
-		tourHandler := &handler.TourHandler{TourService: tourService}
-	*/
+	tourRepo := &TourRepository.TourRepository{Cli: client, Logger: storeLogger}
+	tourService := &TourService.TourService{TourRepository: tourRepo}
+	tourHandler := &handler.TourHandler{TourService: tourService}
 
 	// Keypoints setup
 	keypointRepo := &TourRepository.KeypointRepository{Cli: client, Logger: storeLogger}
@@ -32,7 +30,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	//app.SetupTourRoutes(router, tourHandler)
+	app.SetupTourRoutes(router, tourHandler)
 	app.SetupKeypointRoutes(router, keypointHandler)
 
 	log.Fatal(http.ListenAndServe(app.Port, router))

@@ -8,17 +8,16 @@ import (
 
 func SetupTourRoutes(router *mux.Router, tourHandler *handler.TourHandler) {
 
-	//tour routes
+	router.HandleFunc("/all", tourHandler.GetAll).Methods("GET")
+	router.HandleFunc("/", tourHandler.GetAll).Methods("GET")
+	router.HandleFunc("/{id}", tourHandler.Get).Methods("GET")
+	router.HandleFunc("/{id}", tourHandler.Update).Methods("PUT")
+	router.HandleFunc("/{id}", tourHandler.Delete).Methods("DELETE")
+	router.HandleFunc("/", tourHandler.Create).Methods("POST")
+	router.HandleFunc("/author/{authorId}", tourHandler.GetByAuthor).Methods("GET")
+	router.HandleFunc("/published/{authorId}", tourHandler.GetPublishedByAuthor).Methods("GET")
+	router.HandleFunc("/published", tourHandler.GetPublished).Methods("GET")
 
-	/*
-		router.HandleFunc("/tours/{tourId}", tourHandler.Get).Methods("GET")
-		router.HandleFunc("/tours/create", tourHandler.Create).Methods("POST")
-		router.HandleFunc("/tours/update", tourHandler.Update).Methods("POST")
-		router.HandleFunc("/tours/delete/{tourId}", tourHandler.Delete).Methods("DELETE")
-		router.HandleFunc("/tours/", tourHandler.GetAll).Methods("GET")
-		router.HandleFunc("/tours/author/{authorId}", tourHandler.GetAllByAuthor).Methods("GET")
-
-	*/
 }
 
 func SetupKeypointRoutes(router *mux.Router, keypointHandler *handler.KeypointHandler) {
