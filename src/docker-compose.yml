@@ -1,0 +1,150 @@
+version: "3.9"
+
+services:
+  explorer:
+    build:
+      context: ./old-monolith
+      dockerfile: Dockerfile
+      target: final
+    restart: on-failure
+    networks:
+      - soa
+    ports:
+      - "8080:80"
+    environment:
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
+      DATABASE_PASSWORD: super
+      DATABASE_USER: postgres
+      DATABASE_SCHEMA: explorer
+    depends_on:
+      - database
+
+  ms-tours:
+    build:
+      context: ./ms-tours
+      dockerfile: Dockerfile
+    image: ms_tours_server
+    container_name: ms_tours_server
+    restart: always
+    environment:
+      - MONGODB_ADDR=mongodb://root:pass@mongo:27017
+    networks:
+      - soa
+    ports:
+      - 7007:7007
+    depends_on:
+      - mongo
+
+  ms-encounters:
+    build:
+      context: ./ms-encounters
+      dockerfile: Dockerfile
+    image: ms_encounters_server
+    container_name: ms_encounters_server
+    restart: always
+    networks:
+      - soa
+    ports:
+      - 7008:7007
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_USER: postgres
+      DATABASE_SECRET: super
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
+      DATABASE_NAME: encounters
+    depends_on:
+      - database
+
+  ms-followers:
+    build:
+      context: ./ms-followers
+      dockerfile: Dockerfile
+    container_name: ms-followers
+    restart: always
+    networks:
+      - soa
+    ports:
+      - 8000:8000
+    depends_on:
+      - neo4j-db
+
+  database:
+    image: postgres:latest
+    restart: always
+    networks:
+      - soa
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_MULTIPLE_DATABASES: explorer,encounters,tours
+    volumes:
+      - ./db_init.sh:/docker-entrypoint-initdb.d/db_init.sh
+      - ./old-monolith/scripts/tutours-db-backup.sql:/docker-entrypoint-initdb.d/explorer-init-data.sql
+      - ./ms-tours/script/tours.sql:/docker-entrypoint-initdb.d/tours.sql
+      - ./ms-encounters/script/encounters.sql:/docker-entrypoint-initdb.d/encounters.sql
+    ports:
+      - "5432:5432"
+
+  neo4j-db:
+    image: neo4j
+    container_name: neo4j-db
+    restart: always
+    networks:
+      - soa
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      NEO4J_AUTH: neo4j/password
+    volumes:
+      - /var/lib/neo4j/data:/data
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    networks:
+      - soa
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mongo_tours:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    networks:
+      - soa
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    volumes:
+      - mongo_express_data:/data/db
+
+volumes:
+  soadb:
+    name: explorer
+  mongo_tours:
+  mongo_express_data:
+
+networks:
+  soa:
+    name: soa
+    driver: bridge

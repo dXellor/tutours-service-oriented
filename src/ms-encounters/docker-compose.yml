@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+  ms-encounters:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: ms_encounters_server
+    container_name: ms_encounters_server
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 7008:7007
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_USER: postgres
+      DATABASE_SECRET: postgres
+      DATABASE_HOST: ms-encounters-database
+      DATABASE_PORT: 5432
+      DATABASE_NAME: encounters
+    depends_on:
+      - ms-encounters-database
+
+  ms-encounters-database:
+    image: postgres
+    container_name: postgresql-encounters
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: encounters
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
+volumes:
+  database-data:
+    name: encounters-database
+
+networks:
+  servers:
+    name: servers
+    driver: bridge
