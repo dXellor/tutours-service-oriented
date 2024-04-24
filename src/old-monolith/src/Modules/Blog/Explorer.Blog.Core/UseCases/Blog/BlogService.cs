@@ -8,6 +8,7 @@ using Explorer.Blog.Core.Domain.RepositoryInterfaces;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
 using FluentResults;
 
 namespace Explorer.Blog.Core.UseCases.Blog;
@@ -209,5 +210,10 @@ public class BlogService : BaseService<BlogDto, Domain.Blog>, IBlogService
         }
 
         UpdateStatuses(MapToDto(blog),status);
+    }
+
+    public Result<List<BlogDto>> GetAllFromFollowers(IEnumerable<int> followersIds)
+    {
+        return MapToDto(_repository.GetAllFromCreatorIds(followersIds).ToList());
     }
 }

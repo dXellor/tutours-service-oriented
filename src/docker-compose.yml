@@ -57,6 +57,19 @@ services:
     depends_on:
       - database
 
+  ms-followers:
+    build:
+      context: ./ms-followers
+      dockerfile: Dockerfile
+    container_name: ms-followers
+    restart: always
+    networks:
+      - soa
+    ports:
+      - 8000:8000
+    depends_on:
+      - neo4j-db
+
   database:
     image: postgres:latest
     restart: always
@@ -71,11 +84,22 @@ services:
       - ./old-monolith/scripts/tutours-db-backup.sql:/docker-entrypoint-initdb.d/explorer-init-data.sql
       - ./ms-tours/script/tours.sql:/docker-entrypoint-initdb.d/tours.sql
       - ./ms-encounters/script/encounters.sql:/docker-entrypoint-initdb.d/encounters.sql
-      # - type: bind
-      #   source: ./explorer-init-data.sql
-      #   target: /tmp/explorer-init.sql
     ports:
       - "5432:5432"
+
+  neo4j-db:
+    image: neo4j
+    container_name: neo4j-db
+    restart: always
+    networks:
+      - soa
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      NEO4J_AUTH: neo4j/password
+    volumes:
+      - /var/lib/neo4j/data:/data
 
   mongo:
     image: mongo
@@ -113,44 +137,12 @@ services:
       - "8081:8081"
     volumes:
       - mongo_express_data:/data/db
-  # ms-encounters-database:
-  #   image: postgres:13
-  #   container_name: ms-encounters-database
-  #   restart: always
-  #   networks:
-  #     - soa
-  #   ports:
-  #     - 5433:5433
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: super
-  #     POSTGRES_DB: encounters
-  #     PGPORT: 5433
-  #   volumes:
-  #     - database-data:/var/lib/postgresql/data
-
-  # ms-tours-database:
-  #   image: postgres:13
-  #   container_name: ms-tours-database
-  #   restart: always
-  #   networks:
-  #     - soa
-  #   ports:
-  #     - 5434:5434
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: super
-  #     POSTGRES_DB: tours
-  #     PGPORT: 5434
-  #   volumes:
-  #     - database-data:/var/lib/postgresql/data
 
 volumes:
   soadb:
     name: explorer
   mongo_tours:
   mongo_express_data:
-
 
 networks:
   soa:

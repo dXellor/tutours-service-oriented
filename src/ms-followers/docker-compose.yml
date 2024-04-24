@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  ms-followers:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: ms-followers
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 8000:8000
+    depends_on:
+      - neo4j-db
+
+  neo4j-db:
+    image: neo4j
+    container_name: neo4j-db
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      NEO4J_AUTH: neo4j/password
+    volumes:
+      - /var/lib/neo4j/data:/data
+
+volumes:
+  database-data:
+    name: server-database
+
+networks:
+  servers:
+    name: servers
+    driver: bridge

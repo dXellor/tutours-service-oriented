@@ -13,7 +13,11 @@ namespace Explorer.API.Controllers;
 public class ProfileController : BaseApiController
 {
     private readonly IProfileService _profileService;
-
+    private static HttpClient _followerHttpClient = new()
+    {
+        BaseAddress = new Uri("http://ms-followers:8000"),
+    };
+    
     public ProfileController(IProfileService profileService)
     {
         _profileService = profileService;
@@ -41,16 +45,20 @@ public class ProfileController : BaseApiController
     }
 
     [HttpGet("followers")]
-    public ActionResult<PagedResult<PersonDto>> GetFollowers()
+    public ActionResult<List<PersonDto>> GetFollowers()
     {
-        var result = _profileService.GetFollowers(User.PersonId());
+        var response = _followerHttpClient.GetFromJsonAsync<List<int>>($"/api/v1/followers/{User.PersonId()}").Result;
+        // var result = _profileService.GetFollowers(User.PersonId());
+        var result = _profileService.GetPersonsFromIds(response);
         return CreateResponse(result);
     }
 
     [HttpGet("following")]
-    public ActionResult<PagedResult<PersonDto>> GetFollowing()
+    public ActionResult<List<PersonDto>> GetFollowing()
     {
-        var result = _profileService.GetFollowing(User.PersonId());
+        var response = _followerHttpClient.GetFromJsonAsync<List<int>>($"/api/v1/followings/{User.PersonId()}").Result;
+        // var result = _profileService.GetFollowing(User.PersonId())
+        var result = _profileService.GetPersonsFromIds(response);
         return CreateResponse(result);
     }
 
@@ -68,8 +76,9 @@ public class ProfileController : BaseApiController
     {
         try
         {
-            var result = _profileService.Follow(User.PersonId(), followedId);
-            return CreateResponse(result);
+            var response = _followerHttpClient.PostAsJsonAsync<object>($"/api/v1/follow/{User.PersonId()}/{followedId}", null).Result;
+            // var result = _profileService.Follow(User.PersonId(), followedId);
+            return CreateResponse(Result.Ok());
         }
         catch (ArgumentException e)
         {
@@ -82,8 +91,9 @@ public class ProfileController : BaseApiController
     {
         try
         {
-            var result = _profileService.Unfollow(User.PersonId(), unfollowedId);
-            return CreateResponse(result);
+            var response = _followerHttpClient.PostAsJsonAsync<object>($"/api/v1/unfollow/{User.PersonId()}/{unfollowedId}", null).Result;
+            // var result = _profileService.Unfollow(User.PersonId(), unfollowedId);
+            return CreateResponse(Result.Ok());
         }
         catch (ArgumentException e)
         {
@@ -97,5 +107,12 @@ public class ProfileController : BaseApiController
         var result = _profileService.CanTouristCreateEncounters(ClaimsPrincipalExtensions.PersonId(User));
         return CreateResponse(result);
     }
-
+    
+    [HttpGet("followerRecommendation")]
+    public ActionResult<List<PersonDto>> GetFollowerRecommendation()
+    {
+        var response = _followerHttpClient.GetFromJsonAsync<IEnumerable<int>>($"/api/v1/recommendations/{User.PersonId()}").Result;
+        var result = _profileService.GetPersonsFromIds(response);
+        return CreateResponse(result);
+    }
 }

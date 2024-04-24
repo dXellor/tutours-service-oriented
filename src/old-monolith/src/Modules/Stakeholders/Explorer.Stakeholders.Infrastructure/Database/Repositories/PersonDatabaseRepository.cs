@@ -38,4 +38,10 @@ public class PersonDatabaseRepository : CrudDatabaseRepository<Person, Stakehold
             .FirstOrDefault();
         return person;
     }
+
+    public IEnumerable<Person> GetPersonsFromIds(IEnumerable<int> ids)
+    {
+        var persons = _dbContext.People.Where(p => ids.ToList().Contains((int)p.Id)).ToList();
+        return persons;
+    }
 }

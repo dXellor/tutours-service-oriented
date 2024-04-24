@@ -168,4 +168,9 @@ public class ProfileService : CrudService<PersonDto, Person>, IProfileService, I
     {
         return MapToDto(_personRepository.GetFull(userId));
     }
+
+    public Result<List<PersonDto>> GetPersonsFromIds(IEnumerable<int> ids)
+    {
+        return MapToDto(_personRepository.GetPersonsFromIds(ids).ToList());
+    }
 }
