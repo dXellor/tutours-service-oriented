@@ -14,4 +14,5 @@ public interface IBlogService
     public PagedResult<BlogDto> GetWithStatuses(int page, int pageSize);
     public Result<BlogDto> AddRating(BlogRatingDto blogRatingDto, long userId);
     public void UpdateStatuses(BlogDto blogDto, string status);
+    Result<List<BlogDto>> GetAllFromFollowers(IEnumerable<int> followersIds);
 }

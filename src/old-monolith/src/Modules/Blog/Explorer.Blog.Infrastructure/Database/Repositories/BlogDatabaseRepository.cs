@@ -27,4 +27,10 @@ public class BlogDatabaseRepository : CrudDatabaseRepository<Core.Domain.Blog, B
         task.Wait();
         return task.Result;
     }
+
+    public IEnumerable<Core.Domain.Blog> GetAllFromCreatorIds(IEnumerable<int> ids)
+    {
+        var blogs = _dbSet.Where(b => ids.ToList().Contains((int)b.CreatorId)).ToList();
+        return blogs;
+    }
 }

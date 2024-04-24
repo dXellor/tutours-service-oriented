@@ -33,14 +33,12 @@ export class BlogListDisplayComponent implements OnInit {
 
   getBlogs(): void {
     this.blogs = [];
-    this.service.getBlogsWithStatus().subscribe({
-      next: (result: PagedResult<Blog>) => {
-        for(let b of result.results)
+    this.service.getBlogsFromFollowers().subscribe({
+      next: (result: Blog[]) => {
+        for(let b of result)
         {
           this.blogs.push(b);
           this.allBlogs.push(b);
-          for(let bs of b.blogStatuses as BlogStatus[])
-            this.addBlogStatus(bs)
         }
       },
       error: (err: any) => {

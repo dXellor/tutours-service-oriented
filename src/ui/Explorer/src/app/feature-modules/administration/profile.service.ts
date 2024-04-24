@@ -59,6 +59,12 @@ export class ProfileService {
     );
   }
 
+  getProfilesRecommendation(): Observable<Profile[]> {
+    return this.http.get<Profile[]>(
+      environment.apiHost + `profile/followerRecommendation`
+    );
+  }
+
   getPreviewChats(): Observable<ChatMessage[]> {
     return this.http.get<ChatMessage[]>(`${environment.apiHost}chat/preview`);
   }

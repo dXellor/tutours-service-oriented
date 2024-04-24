@@ -13,6 +13,10 @@ namespace Explorer.API.Controllers.Tourist.Blog;
 public class BlogController : BaseApiController
 {
     private readonly IBlogService _blogService;
+    private static HttpClient _followerHttpClient = new()
+    {
+        BaseAddress = new Uri("http://ms-followers:8000"),
+    };
 
     public BlogController(IBlogService blogService)
     {
@@ -23,6 +27,14 @@ public class BlogController : BaseApiController
     public ActionResult<PagedResult<BlogDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
     {
         var result = _blogService.GetPaged(page, pageSize);
+        return CreateResponse(result);
+    }
+
+    [HttpGet("fromFollowers")]
+    public ActionResult<List<BlogDto>> GetAllFromFollowers([FromQuery] int page, [FromQuery] int pageSize)
+    {
+        var response = _followerHttpClient.GetFromJsonAsync<IEnumerable<int>>($"/api/v1/followings/{User.PersonId()}").Result;
+        var result = _blogService.GetAllFromFollowers(response);
         return CreateResponse(result);
     }
 

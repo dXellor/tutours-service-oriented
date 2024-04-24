@@ -130,6 +130,15 @@ export class ProfileComponent implements OnInit {
         console.log(err);
       },
     });
+
+    this.service.getProfilesRecommendation().subscribe({
+      next: (data: Profile[]) => {
+        this.profilesToFollow = data;
+      },
+      error: (err: any) => {
+        console.log(err);
+      },
+    });
   }
 
   activeSection: string = 'showEdit';
