@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRPCAdapter";
+
+package monolith;
+
+service Monolith {
+  rpc Login (LoginRequest) returns (LoginResponse) {}
+}
+
+// Login messages
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  int64 id = 1;
+  string accessToken = 2;
+}
+// END Login messages
