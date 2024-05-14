@@ -6,10 +6,10 @@ using Grpc.Core;
 
 namespace gRPCAdapter.Services;
 
-public class AuthService: Auth.AuthBase
+public class AuthService: Monolith.MonolithBase
 {
     private readonly IAuthenticationService _authenticationService;
-
+    
     public AuthService(IAuthenticationService authenticationService)
     {
         _authenticationService = authenticationService;
@@ -17,11 +17,13 @@ public class AuthService: Auth.AuthBase
 
     public override Task<LoginResponse> Login(LoginRequest request, ServerCallContext context)
     {
-        CredentialsDto mappedToCredentials = new CredentialsDto();
-        mappedToCredentials.Username = request.Username;
-        mappedToCredentials.Password = request.Password;
+        var mappedToCredentials = new CredentialsDto
+        {
+            Username = request.Username,
+            Password = request.Password
+        };
         var result = _authenticationService.Login(mappedToCredentials);
-
+    
         return Task.FromResult(new LoginResponse
         {
             Id = result.Value.Id,

@@ -25,20 +25,20 @@ func enableCors(h http.Handler) http.Handler {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", ":9999")
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
 
 	s := grpc.NewServer()
 	monolith.RegisterMonolithServer(s, &server{})
-	log.Println("Serving gRPC on 0.0.0.0:8080")
+	log.Println("Serving gRPC on 0.0.0.0:9999")
 	go func() {
 		log.Fatalln(s.Serve(lis))
 	}()
 
 	conn, err := grpc.NewClient(
-		"0.0.0.0:8080",
+		"0.0.0.0:5172",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

@@ -1,3 +1,12 @@
+using Explorer.Blog.Infrastructure;
+using Explorer.Encounters.Infrastructure;
+using Explorer.Payments.Infrastructure;
+using Explorer.Stakeholders.API.Public;
+using Explorer.Stakeholders.Core.Domain.RepositoryInterfaces;
+using Explorer.Stakeholders.Core.UseCases;
+using Explorer.Stakeholders.Infrastructure;
+using Explorer.Stakeholders.Infrastructure.Database.Repositories;
+using Explorer.Tours.Infrastructure;
 using gRPCAdapter.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.ConfigureStakeholdersModule();
+builder.Services.ConfigureToursModule();
+builder.Services.ConfigureBlogModule();
+builder.Services.ConfigureEncountersModule();
+builder.Services.ConfigurePaymentsModule();
 
 var app = builder.Build();
 
