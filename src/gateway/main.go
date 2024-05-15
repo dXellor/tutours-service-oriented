@@ -38,7 +38,7 @@ func main() {
 	}()
 
 	conn, err := grpc.NewClient(
-		"0.0.0.0:5172",
+		"monolith-grpc:80",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
