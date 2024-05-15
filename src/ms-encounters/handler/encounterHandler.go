@@ -17,6 +17,8 @@ type EncounterHandler struct {
 	encounterService           usecase.IEncounterService
 	encounterStatsService      usecase.IEncounterStatsService
 	encounterCompletionService usecase.IEncounterCompletionService
+
+	// encounter.UnimplementedEncounterServiceServer // 
 }
 
 func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterService, encounterStatsService usecase.IEncounterStatsService, encounterCompletionService usecase.IEncounterCompletionService) *chi.Mux {
@@ -64,6 +66,17 @@ func (handler *EncounterHandler) GetAll(writer http.ResponseWriter, reader *http
 	writer.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(writer).Encode(encounters)
 }
+
+// func (handler *EncounterHandler) GetAll(ctx context.Context, request *encounter.EmptyRequest) (*encounter.EncountersResponse) { // need generated files
+// 	encounters, err := handler.encounterService.GetAll()
+// 	if err != nil {
+// 		writer.WriteHeader(http.StatusExpectationFailed)
+// 		return
+// 	}
+// 	writer.WriteHeader(http.StatusOK)
+// 	writer.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(writer).Encode(encounters)
+// }
 
 func (handler *EncounterHandler) Get(writer http.ResponseWriter, reader *http.Request) {
 	var id, _ = strconv.Atoi(chi.URLParam(reader, "id"))
