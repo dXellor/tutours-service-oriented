@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package ms-encounters;
+
+option go_package = "./proto/ms-encounters";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service EncounterService {
+  rpc GetAll(NoParamsRequest) returns(EncountersResponse){}
+  rpc Get(IdRequest) returns(EncounterResponse){}
+  rpc Create(EncounterRequest) returns(EncounterResponse){}
+  rpc Update(IdAndEncounterRequest) returns(EncounterResponse){}
+  rpc Delete(IdRequest) returns(NoParamsResponse){}
+  rpc GetApprovedByStatus(GetApprovedByStatusRequest) returns(EncountersResponse){}
+  rpc GetByUser(IdRequest) returns(EncountersResponse){}
+  rpc GetTouristCreatedEncounters(NoParamsRequest) returns(EncountersResponse){}
+  rpc Approve(EncounterRequest) returns(EncounterResponse){}
+  rpc Decline(EncounterRequest) returns(EncounterResponse){}
+}
+
+service EncounterCompletionService {
+  rpc GetByUser(UserIdRequest) returns(EncounterCompletionsResponse){}
+  rpc StartEncounter(IdAndEncounterRequest) returns(EncounterCompletionResponse){}
+  rpc FinishEncounter(IdAndEncounterRequest) returns(EncounterCompletionResponse){}
+}
+
+service EncounterStatsService {
+  rpc GetEncounterStatsByUser(UserIdRequest) returns(EncounterStatsResponse){}
+  rpc GetEncounterYearStatsByUser(UserIdAndYearRequest) returns(EncounterYearStatsResponse){}
+}
+
+message Encounter {
+  int32 Id = 1;
+  int32 UserId = 2;
+  string Name = 3;
+  string Description = 4;
+  float Latitude = 5;
+  float Longitude = 6;
+  int32 Xp = 7;
+  enum EncounterStatus {
+      ACTIVE = 0
+      DRAFT = 1
+      ARCHIVED = 2
+  } 
+  EncounterStatus Status = 8;
+  enum EncounterType {
+      SOCIAL = 0 
+      LOCATION = 1
+      MISC = 2
+  } 
+  EncounterType Type = 9;
+  float Range = 10;
+  string Image = 11;
+  int32 PeopleCount = 12;
+  enum EncounterApprovalStatus {
+      PENDING = 0;
+      SYSTEM_APPROVED = 1;
+      ADMIN_APPROVED = 2;
+      DECLINED = 3;
+  } 
+  EncounterApprovalStatus approvalStatus = 13;
+  float ImageLatitude = 14;
+  float ImageLongitude = 15;
+}
+
+message EncounterCompletion {
+  int32 Id = 1;
+  int32 UserId = 2;
+  int32 EncounterId = 3;
+  google.protobuf.Timestamp LastUpdatedAt = 4;
+  int32 Xp = 5;
+  EncounterCompletionStatus Status = 6;
+  Encounter Encounter = 7;
+}
+
+message EncounterStats {
+  int32 CompletedCount = 1;
+  int32 FailedCount = 2;
+}
+
+message EncounterYearStats {
+  int32 Year = 1;
+  repeated int32 CompletedCountByMonths = 2; // idk valjda
+  repeated int32 FailedCountByMonths = 3; // idk valjda
+}
+
+message NoParamsRequest{}
+message NoParamsResponse{}
+
+message IdRequest {
+  int64 Id = 1;
+}
+
+message UserIdRequest {
+  int64 UserId = 1;
+}
+
+message UserIdAndYearRequest {
+  int64 UserId = 1;
+  int64 Year = 2;
+}
+
+message EncounterRequest {
+  Encounter Encounter = 2;
+}
+
+message IdAndEncounterRequest {
+  int64 UserId = 1;
+  Encounter Encounter = 2;
+}
+
+message GetApprovedByStatusRequest {
+  EncounterStatus Status = 1;
+}
+
+message EncountersResponse {
+  repeated Encounter Encounters = 1;
+}
+
+message EncounterCompletionResponse {
+  EncounterCompletion EncounterCompletion = 1;
+}
+
+message EncounterCompletionsResponse {
+  repeated EncounterCompletion EncounterCompletions = 1;
+}
+
+message EncounterStatsResponse {
+  EncounterStats EncounterStats = 1;
+}
+
+message EncounterYearStatsResponse {
+  EncounterYearStats EncounterYearStats = 1;
+}
