@@ -1,12 +1,14 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"tutours/soa/ms-encounters/model"
 	"tutours/soa/ms-encounters/model/enum"
+	ms_encounters "tutours/soa/ms-encounters/proto"
 	"tutours/soa/ms-encounters/usecase"
 
 	"github.com/go-chi/chi"
@@ -18,7 +20,7 @@ type EncounterHandler struct {
 	encounterStatsService      usecase.IEncounterStatsService
 	encounterCompletionService usecase.IEncounterCompletionService
 
-	// encounter.UnimplementedEncounterServiceServer // 
+	ms_encounters.UnimplementedEncountersServer
 }
 
 func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterService, encounterStatsService usecase.IEncounterStatsService, encounterCompletionService usecase.IEncounterCompletionService) *chi.Mux {
@@ -30,8 +32,8 @@ func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterS
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
-	router.Get("/all", handler.GetAll)
-	router.Get("/", handler.GetAll)
+	//router.Get("/all", handler.GetAll)
+	//router.Get("/", handler.GetAll)
 	router.Get("/{id}", handler.Get)
 	router.Post("/", handler.Create)
 	router.Put("/{id}", handler.Update)
@@ -56,18 +58,7 @@ func (handler *EncounterHandler) InitRouter(encounterService usecase.IEncounterS
 	return router
 }
 
-func (handler *EncounterHandler) GetAll(writer http.ResponseWriter, reader *http.Request) {
-	encounters, err := handler.encounterService.GetAll()
-	if err != nil {
-		writer.WriteHeader(http.StatusExpectationFailed)
-		return
-	}
-	writer.WriteHeader(http.StatusOK)
-	writer.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(writer).Encode(encounters)
-}
-
-// func (handler *EncounterHandler) GetAll(ctx context.Context, request *encounter.EmptyRequest) (*encounter.EncountersResponse) { // need generated files
+// func (handler *EncounterHandler) GetAll(writer http.ResponseWriter, reader *http.Request) {
 // 	encounters, err := handler.encounterService.GetAll()
 // 	if err != nil {
 // 		writer.WriteHeader(http.StatusExpectationFailed)
@@ -77,6 +68,76 @@ func (handler *EncounterHandler) GetAll(writer http.ResponseWriter, reader *http
 // 	writer.Header().Set("Content-Type", "application/json")
 // 	json.NewEncoder(writer).Encode(encounters)
 // }
+
+func encounterTypeToGRPC(encounterType enum.EncounterType) ms_encounters.Encounter_EncounterType {
+	switch encounterType {
+	case enum.SOCIAL:
+		return ms_encounters.Encounter_SOCIAL
+	case enum.LOCATION:
+		return ms_encounters.Encounter_LOCATION
+	default:
+		return ms_encounters.Encounter_MISC
+	}
+}
+func encounterStatusToGRPC(status enum.EncounterStatus) ms_encounters.EncounterStatus {
+	switch status {
+	case enum.ACTIVE:
+		return ms_encounters.EncounterStatus_ACTIVE
+	case enum.DRAFT:
+		return ms_encounters.EncounterStatus_DRAFT
+	default:
+		return ms_encounters.EncounterStatus_ARCHIVED
+	}
+
+}
+func encounterApprovalStatusToGRPC(status enum.EncounterApprovalStatus) ms_encounters.Encounter_EncounterApprovalStatus {
+	switch status {
+	case enum.ADMIN_APPROVED:
+		return ms_encounters.Encounter_ADMIN_APPROVED
+	case enum.SYSTEM_APPROVED:
+		return ms_encounters.Encounter_SYSTEM_APPROVED
+	case enum.DECLINED:
+		return ms_encounters.Encounter_DECLINED
+	default:
+		return ms_encounters.Encounter_PENDING
+	}
+}
+
+func encounterToGRPC(e *model.Encounter) *ms_encounters.Encounter {
+	return &ms_encounters.Encounter{
+		Id:             int32(e.Id),
+		UserId:         int32(e.UserId),
+		Name:           e.Name,
+		Description:    e.Description,
+		Latitude:       float32(e.Latitude),
+		Longitude:      float32(e.Longitude),
+		Xp:             int32(e.Xp),
+		Status:         encounterStatusToGRPC(e.Status),
+		Type:           encounterTypeToGRPC(e.Type),
+		Range:          float32(e.Range),
+		Image:          e.Image,
+		ImageLatitude:  float32(e.ImageLatitude),
+		ImageLongitude: float32(e.ImageLongitude),
+		PeopleCount:    int32(e.PeopleCount),
+		ApprovalStatus: encounterApprovalStatusToGRPC(e.ApprovalStatus),
+	}
+}
+
+func encountersToGRPC(encounters []model.Encounter) *ms_encounters.EncountersResponse {
+	result := make([]*ms_encounters.Encounter, len(encounters))
+	for i, e := range encounters {
+		result[i] = encounterToGRPC(&e)
+	}
+	return &ms_encounters.EncountersResponse{Encounters: result}
+}
+
+func (handler *EncounterHandler) GetAll(ctx context.Context, request *ms_encounters.NoParamsRequest) (*ms_encounters.EncountersResponse, error) {
+	encounters, err := handler.encounterService.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return encountersToGRPC(encounters), nil
+}
 
 func (handler *EncounterHandler) Get(writer http.ResponseWriter, reader *http.Request) {
 	var id, _ = strconv.Atoi(chi.URLParam(reader, "id"))

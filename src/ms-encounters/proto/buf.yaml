@@ -1,0 +1,4 @@
+version: v1
+name: buf.build/soa/ms-encounters
+deps:
+  - buf.build/googleapis/googleapis

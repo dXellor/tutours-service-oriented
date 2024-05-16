@@ -1,35 +1,22 @@
 syntax = "proto3";
 
-package ms-encounters;
+package ms_encounters;
 
 option go_package = "./proto/ms-encounters";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-service EncounterService {
+service Encounters {
   rpc GetAll(NoParamsRequest) returns(EncountersResponse){}
-  rpc Get(IdRequest) returns(EncounterResponse){}
-  rpc Create(EncounterRequest) returns(EncounterResponse){}
-  rpc Update(IdAndEncounterRequest) returns(EncounterResponse){}
-  rpc Delete(IdRequest) returns(NoParamsResponse){}
-  rpc GetApprovedByStatus(GetApprovedByStatusRequest) returns(EncountersResponse){}
-  rpc GetByUser(IdRequest) returns(EncountersResponse){}
-  rpc GetTouristCreatedEncounters(NoParamsRequest) returns(EncountersResponse){}
-  rpc Approve(EncounterRequest) returns(EncounterResponse){}
-  rpc Decline(EncounterRequest) returns(EncounterResponse){}
+  
 }
 
-service EncounterCompletionService {
-  rpc GetByUser(UserIdRequest) returns(EncounterCompletionsResponse){}
-  rpc StartEncounter(IdAndEncounterRequest) returns(EncounterCompletionResponse){}
-  rpc FinishEncounter(IdAndEncounterRequest) returns(EncounterCompletionResponse){}
-}
-
-service EncounterStatsService {
-  rpc GetEncounterStatsByUser(UserIdRequest) returns(EncounterStatsResponse){}
-  rpc GetEncounterYearStatsByUser(UserIdAndYearRequest) returns(EncounterYearStatsResponse){}
-}
+enum EncounterStatus {
+  ACTIVE = 0;
+  DRAFT = 1;
+  ARCHIVED = 2;
+} 
 
 message Encounter {
   int32 Id = 1;
@@ -39,16 +26,11 @@ message Encounter {
   float Latitude = 5;
   float Longitude = 6;
   int32 Xp = 7;
-  enum EncounterStatus {
-      ACTIVE = 0
-      DRAFT = 1
-      ARCHIVED = 2
-  } 
   EncounterStatus Status = 8;
   enum EncounterType {
-      SOCIAL = 0 
-      LOCATION = 1
-      MISC = 2
+      SOCIAL = 0;
+      LOCATION = 1;
+      MISC = 2;
   } 
   EncounterType Type = 9;
   float Range = 10;
@@ -71,6 +53,12 @@ message EncounterCompletion {
   int32 EncounterId = 3;
   google.protobuf.Timestamp LastUpdatedAt = 4;
   int32 Xp = 5;
+  enum EncounterCompletionStatus {
+    	STARTED = 0;
+      FAILED = 1;
+      COMPLETED = 2;
+      PROGRESSING = 3;
+  }
   EncounterCompletionStatus Status = 6;
   Encounter Encounter = 7;
 }
@@ -106,8 +94,12 @@ message EncounterRequest {
   Encounter Encounter = 2;
 }
 
+message EncounterResponse {
+  Encounter Encounter = 2;
+}
+
 message IdAndEncounterRequest {
-  int64 UserId = 1;
+  int64 Id = 1;
   Encounter Encounter = 2;
 }
 

@@ -3,14 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"os"
 
 	encounterrepository "tutours/soa/ms-encounters/dataservice/encounterRepository"
 	"tutours/soa/ms-encounters/handler"
 	encounterservice "tutours/soa/ms-encounters/usecase/encounterService"
 
+	ms_encounters "tutours/soa/ms-encounters/proto"
+
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -18,6 +22,7 @@ import (
 
 func main() {
 
+	loadConfig();
 	database := initDB()
 	populateDB(database)
 
@@ -34,10 +39,21 @@ func main() {
 	encounterCompletionService.Init(&encounterCompletionRepository)
 	encounterHandler := handler.EncounterHandler{}
 
-	router := encounterHandler.InitRouter(&encounterService, &encounterStatsService, &encounterCompletionService)
-	fmt.Println("Encounters micro-service running")
-	http.ListenAndServe(":7007", router)
+	// router := encounterHandler.InitRouter(&encounterService, &encounterStatsService, &encounterCompletionService)
+	// fmt.Println("Encounters micro-service running")
+	// http.ListenAndServe(":7007", router)
 
+	lis, err := net.Listen("tcp", "localhost:8000")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	var opts []grpc.ServerOption
+	grpcServer := grpc.NewServer(opts...)
+
+	ms_encounters.RegisterEncountersServer(grpcServer, &encounterHandler)
+	reflection.Register(grpcServer)
+	grpcServer.Serve(lis)
 }
 
 func loadConfig() {

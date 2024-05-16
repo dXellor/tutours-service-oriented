@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package ms-encounters;
+package ms_encounters;
 
 option go_package = "./proto/ms-encounters";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-service EncounterService {
+service Encounters {
   rpc GetAll(NoParamsRequest) returns(EncountersResponse) {
     option (google.api.http) = {
       get:"/api/encounter"
@@ -15,7 +15,7 @@ service EncounterService {
   }
   rpc Get(IdRequest) returns(EncounterResponse) {
     option (google.api.http) = {
-      get:"/api/encounter/{id}"
+      get:"/api/encounter/{Id}"
     };
   }
   rpc Create(EncounterRequest) returns(EncounterResponse) {
@@ -26,7 +26,7 @@ service EncounterService {
   }
   rpc Update(IdAndEncounterRequest) returns(EncounterResponse) {
     option (google.api.http) = {
-      put:"/api/encounter/{id}"
+      put:"/api/encounter/{Id}"
       body:"*"
     };
   }
@@ -37,12 +37,12 @@ service EncounterService {
   }
   rpc GetApprovedByStatus(GetApprovedByStatusRequest) returns(EncountersResponse) {
     option (google.api.http) = {
-      get:"/api/encounter"
+      get:"/api/encounter/status"
     };
   }
   rpc GetByUser(IdRequest) returns(EncountersResponse) {
     option (google.api.http) = {
-      get:"/api/encounter/status"
+      get:"/api/encounter/byUser"
     };
   }
   rpc GetTouristCreatedEncounters(NoParamsRequest) returns(EncountersResponse) {
@@ -62,10 +62,7 @@ service EncounterService {
       body:"*"
     };
   }
-}
-
-service EncounterCompletionService {
-  rpc GetByUser(UserIdRequest) returns(EncounterCompletionsResponse) {
+  rpc GetCompletionByUser(UserIdRequest) returns(EncounterCompletionsResponse) {
     option (google.api.http) = {
       get: "/api/tourist/encounter"
     };
@@ -82,9 +79,6 @@ service EncounterCompletionService {
       body: "*"
     };
   }
-}
-
-service EncounterStatsService {
   rpc GetEncounterStatsByUser(UserIdRequest) returns(EncounterStatsResponse) {
     option (google.api.http) = {
       get:"/api/tourist/encounterStatistics/completions"
@@ -98,9 +92,9 @@ service EncounterStatsService {
 }
 
 enum EncounterStatus {
-  ACTIVE = 0
-  DRAFT = 1
-  ARCHIVED = 2
+  ACTIVE = 0;
+  DRAFT = 1;
+  ARCHIVED = 2;
 } 
 
 message Encounter {
@@ -113,9 +107,9 @@ message Encounter {
   int32 Xp = 7;
   EncounterStatus Status = 8;
   enum EncounterType {
-      SOCIAL = 0 
-      LOCATION = 1
-      MISC = 2
+      SOCIAL = 0;
+      LOCATION = 1;
+      MISC = 2;
   } 
   EncounterType Type = 9;
   float Range = 10;
@@ -138,6 +132,12 @@ message EncounterCompletion {
   int32 EncounterId = 3;
   google.protobuf.Timestamp LastUpdatedAt = 4;
   int32 Xp = 5;
+  enum EncounterCompletionStatus {
+    	STARTED = 0;
+      FAILED = 1;
+      COMPLETED = 2;
+      PROGRESSING = 3;
+  }
   EncounterCompletionStatus Status = 6;
   Encounter Encounter = 7;
 }
@@ -173,8 +173,12 @@ message EncounterRequest {
   Encounter Encounter = 2;
 }
 
+message EncounterResponse {
+  Encounter Encounter = 2;
+}
+
 message IdAndEncounterRequest {
-  int64 UserId = 1;
+  int64 Id = 1;
   Encounter Encounter = 2;
 }
 
