@@ -28,13 +28,18 @@ services:
     container_name: ms_tours_server
     restart: always
     environment:
-      - MONGODB_ADDR=mongodb://root:pass@mongo:27017
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
+      DATABASE_TYPE: postgresql
+      DATABASE_USER: postgres
+      DATABASE_SECRET: super
+      DATABASE_NAME: tours
     networks:
       - soa
     ports:
       - 7007:7007
     depends_on:
-      - mongo
+      - database
 
   ms-encounters:
     build:
@@ -101,48 +106,12 @@ services:
     volumes:
       - /var/lib/neo4j/data:/data
 
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: pass
-    networks:
-      - soa
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok'
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    volumes:
-      - mongo_tours:/data/db
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    networks:
-      - soa
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=mongo
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
-      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
-    depends_on:
-      - mongo
-    ports:
-      - "8081:8081"
-    volumes:
-      - mongo_express_data:/data/db
-
 volumes:
   soadb:
     name: explorer
   mongo_tours:
   mongo_express_data:
+
 
 networks:
   soa:

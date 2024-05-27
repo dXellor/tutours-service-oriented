@@ -1,37 +1,83 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"tutours/soa/ms-tours/app"
-	TourRepository "tutours/soa/ms-tours/dataservice/tourRepository"
-	"tutours/soa/ms-tours/handler"
-	TourService "tutours/soa/ms-tours/usecase/tourService"
 
-	"github.com/gorilla/mux"
+	tourrepository "tutours/soa/ms-tours/dataservice/tourRepository"
+	"tutours/soa/ms-tours/handler"
+	tourservice "tutours/soa/ms-tours/usecase/tourService"
+
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 func main() {
-	app.Init()
-	client := app.InitDB()
-	storeLogger := log.New(os.Stdout, "[tours-database] ", log.LstdFlags)
-	app.InsertInfo(client)
+	// loadConfig()
 
-	// Tours setup
-	tourRepo := &TourRepository.TourRepository{Cli: client, Logger: storeLogger}
-	tourService := &TourService.TourService{TourRepository: tourRepo}
-	tourHandler := &handler.TourHandler{TourService: tourService}
+	database := initDB()
+	populateDB(database)
 
-	// Keypoints setup
-	keypointRepo := &TourRepository.KeypointRepository{Cli: client, Logger: storeLogger}
-	keypointService := &TourService.KeypointService{KeypointRepository: keypointRepo}
-	keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
+	tourRepository := tourrepository.TourRepository{}
+	tourRepository.Init(database)
 
-	router := mux.NewRouter()
+	keypointRepository := tourrepository.KeypointRepository{}
+	keypointRepository.Init(database)
 
-	app.SetupTourRoutes(router, tourHandler)
-	app.SetupKeypointRoutes(router, keypointHandler)
+	tourService := tourservice.TourService{}
+	tourService.Init(&tourRepository)
 
-	log.Fatal(http.ListenAndServe(app.Port, router))
+	keypointService := tourservice.KeypointService{}
+	keypointService.Init(&keypointRepository)
+
+	tourhandler := handler.TourHandler{}
+	keypointHandler := handler.KeypointHandler{}
+
+	router := tourhandler.InitRouter(&tourService)
+	router = keypointHandler.InitRouter(&keypointService, router)
+
+	fmt.Println("Tours micro-service running")
+	http.ListenAndServe(":7007", router)
+
+}
+
+func loadConfig() {
+	envErr := godotenv.Load("config/.env")
+
+	if envErr != nil {
+		log.Fatalf(envErr.Error())
+	}
+}
+
+func initDB() *gorm.DB {
+
+	dbType := os.Getenv("DATABASE_TYPE")
+	dbUser := os.Getenv("DATABASE_USER")
+	dbSecret := os.Getenv("DATABASE_SECRET")
+	dbHost := os.Getenv("DATABASE_HOST")
+	dbPort := os.Getenv("DATABASE_PORT")
+	dbName := os.Getenv("DATABASE_NAME")
+	connectionUrl := fmt.Sprintf("%s://%s:%s@%s:%s/%s", dbType, dbUser, dbSecret, dbHost, dbPort, dbName)
+	database, databaseErr := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{NamingStrategy: schema.NamingStrategy{
+		NoLowerCase: true,
+	}})
+	if databaseErr != nil {
+		log.Fatalf(databaseErr.Error())
+		return nil
+	}
+	return database
+}
+
+func populateDB(database *gorm.DB) {
+	c, ioErr := os.ReadFile("script/tours.sql")
+	if ioErr != nil {
+		log.Fatalf(ioErr.Error())
+	}
+	sql := string(c)
+
+	database.Exec(sql)
 }
