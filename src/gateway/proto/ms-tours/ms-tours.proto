@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package ms_tours;
+
+option go_package = "./proto/ms-tours";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service TourService {
+  rpc GetAll(NoParamsRequest) returns (ToursResponse) {
+    option (google.api.http) = {
+      get: "/api/tour"
+    };
+  }
+  rpc Get(IdRequest) returns (TourResponse) {
+    option (google.api.http) = {
+      get: "/api/tour/{id}"
+    };
+  }
+  rpc Create(TourRequest) returns (TourResponse) {
+    option (google.api.http) = {
+      post: "/api/tour"
+      body: "*"
+    };
+  }
+  rpc Update(IdAndTourRequest) returns (TourResponse) {
+    option (google.api.http) = {
+      put: "/api/tour/{id}"
+      body: "*"
+    };
+  }
+  rpc Delete(IdRequest) returns (NoParamsResponse) {
+    option (google.api.http) = {
+      delete: "/api/tour/{id}"
+    };
+  }
+  rpc GetByAuthor(IdRequest) returns (ToursResponse) {
+    option (google.api.http) = {
+      get: "/api/tour/author/{authorId}"
+    };
+  }
+  rpc GetPublishedByAuthor(IdRequest) returns (ToursResponse) {
+    option (google.api.http) = {
+      get: "/api/tour/published/author/{authorId}"
+    };
+  }
+  rpc GetPublished(NoParamsRequest) returns (ToursResponse) {
+    option (google.api.http) = {
+      get: "/api/tour/published"
+    };
+  }
+}
+
+service KeypointService {
+  rpc GetAll(NoParamsRequest) returns (KeypointsResponse) {
+    option (google.api.http) = {
+      get: "/api/keypoint"
+    };
+  }
+  rpc Create(KeypointRequest) returns (KeypointResponse) {
+    option (google.api.http) = {
+      post: "/api/keypoint"
+      body: "*"
+    };
+  }
+  rpc Update(IdAndKeypointRequest) returns (KeypointResponse) {
+    option (google.api.http) = {
+      put: "/api/keypoint/{id}"
+      body: "*"
+    };
+  }
+  rpc Delete(IdRequest) returns (NoParamsResponse) {
+    option (google.api.http) = {
+      delete: "/api/keypoint/{id}"
+    };
+  }
+  rpc GetByTour(IdRequest) returns (KeypointsResponse) {
+    option (google.api.http) = {
+      get: "/api/keypoint/tour/{tourId}"
+    };
+  }
+}
+
+message Tour {
+  int32 Id = 1;
+  int32 UserId = 2;
+  string Name = 3;
+  string Description = 4;
+  float Price = 5;
+  int32 Duration = 6;
+  float Distance = 7;
+  TourDifficulty Difficulty = 8;
+  TransportType TransportType = 9;
+  TourStatus Status = 10;
+  google.protobuf.Timestamp StatusUpdateTime = 11;
+  repeated string Tags = 12;
+  repeated Keypoint Keypoints = 13;
+}
+
+message Keypoint {
+  int32 Id = 1;
+  int32 TourId = 2;
+  string Name = 3;
+  float Latitude = 4;
+  float Longitude = 5;
+  string Description = 6;
+  int32 Position = 7;
+  string Image = 8;
+  string Secret = 9;
+}
+
+enum TourDifficulty {
+  EASY = 0;
+  MEDIUM = 1;
+  HARD = 2;
+  EXTREME = 3;
+}
+
+enum TourStatus {
+  DRAFT = 0;
+  PUBLISHED = 1;
+  ARCHIVED = 2;
+}
+
+enum TransportType {
+  WALK = 0;
+  BIKE = 1;
+  CAR = 2;
+  BOAT = 3;
+}
+
+message NoParamsRequest {}
+message NoParamsResponse {}
+
+message IdRequest {
+  int64 Id = 1;
+}
+
+message TourRequest {
+  Tour Tour = 1;
+}
+
+message KeypointRequest {
+  Keypoint Keypoint = 1;
+}
+
+message IdAndTourRequest {
+  int64 Id = 1;
+  Tour Tour = 2;
+}
+
+message IdAndKeypointRequest {
+  int64 Id = 1;
+  Keypoint Keypoint = 2;
+}
+
+message ToursResponse {
+  repeated Tour Tours = 1;
+}
+
+message TourResponse {
+  Tour Tour = 1;
+}
+
+message KeypointsResponse {
+  repeated Keypoint Keypoints = 1;
+}
+
+message KeypointResponse {
+  Keypoint Keypoint = 1;
+}
