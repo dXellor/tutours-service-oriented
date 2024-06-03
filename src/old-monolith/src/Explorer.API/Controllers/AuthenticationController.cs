@@ -1,5 +1,6 @@
 ﻿using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Explorer.API.Controllers;
@@ -8,6 +9,11 @@ namespace Explorer.API.Controllers;
 public class AuthenticationController : BaseApiController
 {
     private readonly IAuthenticationService _authenticationService;
+
+    private static HttpClient _HttpClient = new()
+    {
+        BaseAddress = new Uri("http://ms-auth:7007"),
+    };
 
     public AuthenticationController(IAuthenticationService authenticationService)
     {
@@ -24,7 +30,9 @@ public class AuthenticationController : BaseApiController
     [HttpPost("login")]
     public ActionResult<AuthenticationTokensDto> Login([FromBody] CredentialsDto credentials)
     {
-        var result = _authenticationService.Login(credentials);
+        var response = _HttpClient.PostAsJsonAsync<CredentialsDto>("/auth/login", credentials).Result;
+        var credentialsDto = response.Content.ReadFromJsonAsync<CredentialsDto>().Result;
+        var result = Result.Ok<CredentialsDto>(credentialsDto);
         return CreateResponse(result);
     }
 

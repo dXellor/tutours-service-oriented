@@ -19,7 +19,6 @@ func main() {
 
 	database := initDB()
 	populateDB(database)
-
 	userRepository := repo.UserRepository{}
 	userRepository.Init(database)
 
@@ -30,8 +29,8 @@ func main() {
 
 	router := userhandler.InitRouter(&userService)
 
-	fmt.Println("Stakeholders micro-service running")
-	http.ListenAndServe(":7007", router)
+	fmt.Println("Auth micro-service running")
+	http.ListenAndServe(":7009", router)
 }
 
 func loadConfig() {

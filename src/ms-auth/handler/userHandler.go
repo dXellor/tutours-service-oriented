@@ -24,7 +24,7 @@ func (handler *UserHandler) InitRouter(userService *service.UserService) *chi.Mu
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
-	router.Post("/stakeholder/login", handler.Login)
+	router.Post("/auth/login", handler.Login)
 	router.Post("/stakeholder/validateToken", handler.ValidateToken)
 
 	return router

@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+  ms-auth:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: ms_auth_server
+    container_name: ms_auth_server
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 7009:7007
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_USER: postgres
+      DATABASE_SECRET: postgres
+      DATABASE_HOST: ms-auth-database
+      DATABASE_PORT: 5432
+      DATABASE_NAME: users
+    depends_on:
+      - ms-auth-database
+
+  ms-auth-database:
+    image: postgres
+    container_name: postgresql-auth
+    restart: always
+    networks:
+      - servers
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
+volumes:
+  database-data:
+    name: auth-database
+
+networks:
+  servers:
+    name: servers
+    driver: bridge

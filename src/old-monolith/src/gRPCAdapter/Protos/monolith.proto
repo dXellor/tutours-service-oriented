@@ -5,7 +5,12 @@ option csharp_namespace = "gRPCAdapter";
 package monolith;
 
 service Monolith {
-  rpc Login (LoginRequest) returns (LoginResponse) {}
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/users"
+      body: "*"
+    };
+  }
 }
 
 // Login messages
