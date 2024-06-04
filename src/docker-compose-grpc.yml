@@ -47,11 +47,34 @@ services:
       - ./ms-tours/script/tours.sql:/docker-entrypoint-initdb.d/tours.sql
       - ./ms-encounters/script/encounters.sql:/docker-entrypoint-initdb.d/encounters.sql
 
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus:v2.36.0
+    container_name: prometej
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - 10000:9090
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus-storage:/prometheus
+
 volumes:
   soadb:
     name: explorer
   mongo_tours:
   mongo_express_data:
+  grafana-storage:
+  prometheus-storage:
 
 networks:
   soa:
