@@ -5,6 +5,7 @@ import (
 	"ms-auth/model"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
@@ -28,42 +29,43 @@ func (jwtGen *JwtGenerator) GenerateAccessToken(user *model.User, personID int) 
 	var authToken model.AuthenticationToken
 
 	claims := jwt.MapClaims{
+		"aud":      "explorer-front.com",
+		"iss":      "explorer",
 		"jti":      uuid.New(),
 		"id":       user.Id,
 		"username": user.Username,
 		"personId": personID,
 		"role":     user.Role,
+		"exp":      time.Now().Add(time.Hour).Unix(),
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	jwtString, err := token.SignedString([]byte(jwtGen.Key))
 	if err != nil {
 		return authToken, fmt.Errorf("failed to generate access token: %v", err)
 	}
 
+	fmt.Println("Signed JWT:", jwtString)
+
 	authToken.Id = strconv.Itoa(user.Id)
 	authToken.AccessToken = jwtString
-
 	return authToken, nil
 }
+
 func (jwtGen *JwtGenerator) ValidateAccessToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		// Return the key for validation
 		return []byte(jwtGen.Key), nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("token parsing error: %v", err)
 	}
 
-	// Check if the token is valid
 	if !token.Valid {
 		return nil, fmt.Errorf("token is not valid")
 	}
 
-	// Extract claims
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, fmt.Errorf("failed to extract claims from token")
