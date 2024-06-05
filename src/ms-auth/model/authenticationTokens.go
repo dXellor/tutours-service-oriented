@@ -1,6 +1,6 @@
 package model
 
-type AuthenticationTokens struct {
+type AuthenticationToken struct {
 	Id          string
 	AccessToken string
 }

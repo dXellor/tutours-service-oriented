@@ -1,7 +1,7 @@
-package repo
+package UserRepository
 
 import (
-	"ms-stakeholders/model"
+	"ms-auth/model"
 
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ func (userRepository *UserRepository) Init(databaseConnection *gorm.DB) {
 
 func (repo *UserRepository) GetActiveByUsername(username string) (model.User, error) {
 	var user model.User
-	dbResult := repo.DatabaseConnection.Where("username = ?", username).Find(&user)
+	dbResult := repo.DatabaseConnection.Find(&user, "\"Username\"=?", username)
 	if dbResult.Error != nil {
 		return user, dbResult.Error
 	}
@@ -24,7 +24,7 @@ func (repo *UserRepository) GetActiveByUsername(username string) (model.User, er
 }
 func (repo *UserRepository) GetPerson(id int) (model.Person, error) {
 	var person model.Person
-	dbResult := repo.DatabaseConnection.Where("user_id = ?", id).Find(&person)
+	dbResult := repo.DatabaseConnection.Find(&person, "\"UserId\"=?", id)
 	if dbResult.Error != nil {
 		return person, dbResult.Error
 	}

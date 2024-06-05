@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	"ms-stakeholders/model"
+	"ms-auth/model"
 	"os"
 	"strconv"
 
@@ -24,8 +24,8 @@ func NewJwtGenerator() *JwtGenerator {
 	}
 }
 
-func (jwtGen *JwtGenerator) GenerateAccessToken(user *model.User, personID int) (model.AuthenticationTokens, error) {
-	var authToken model.AuthenticationTokens
+func (jwtGen *JwtGenerator) GenerateAccessToken(user *model.User, personID int) (model.AuthenticationToken, error) {
+	var authToken model.AuthenticationToken
 
 	claims := jwt.MapClaims{
 		"jti":      uuid.New(),

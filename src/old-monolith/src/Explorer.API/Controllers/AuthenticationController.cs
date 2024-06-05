@@ -10,9 +10,9 @@ public class AuthenticationController : BaseApiController
 {
     private readonly IAuthenticationService _authenticationService;
 
-    private static HttpClient _HttpClient = new()
+    private static readonly HttpClient AuthHttpClient = new()
     {
-        BaseAddress = new Uri("http://ms-auth:7007"),
+        BaseAddress = new Uri("http://ms-auth:8040"),
     };
 
     public AuthenticationController(IAuthenticationService authenticationService)
@@ -30,9 +30,9 @@ public class AuthenticationController : BaseApiController
     [HttpPost("login")]
     public ActionResult<AuthenticationTokensDto> Login([FromBody] CredentialsDto credentials)
     {
-        var response = _HttpClient.PostAsJsonAsync<CredentialsDto>("/auth/login", credentials).Result;
-        var credentialsDto = response.Content.ReadFromJsonAsync<CredentialsDto>().Result;
-        var result = Result.Ok<CredentialsDto>(credentialsDto);
+        var response = AuthHttpClient.PostAsJsonAsync("/login", credentials).Result;
+        var auth = response.Content.ReadFromJsonAsync<AuthenticationTokensDto>().Result;
+        var result = Result.Ok<AuthenticationTokensDto>(auth);
         return CreateResponse(result);
     }
 

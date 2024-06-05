@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"ms-stakeholders/handler"
-	"ms-stakeholders/repo"
-	"ms-stakeholders/service"
+	userRepository "ms-auth/dataservice/userRepository"
+	"ms-auth/handler"
+	userservice "ms-auth/usecase/userService"
 	"net/http"
 	"os"
 
@@ -19,10 +19,10 @@ func main() {
 
 	database := initDB()
 	populateDB(database)
-	userRepository := repo.UserRepository{}
+	userRepository := userRepository.UserRepository{}
 	userRepository.Init(database)
 
-	userService := service.UserService{}
+	userService := userservice.UserService{}
 	userService.Init(&userRepository)
 
 	userhandler := handler.UserHandler{}
@@ -30,7 +30,7 @@ func main() {
 	router := userhandler.InitRouter(&userService)
 
 	fmt.Println("Auth micro-service running")
-	http.ListenAndServe(":7009", router)
+	http.ListenAndServe(":8040", router)
 }
 
 func loadConfig() {

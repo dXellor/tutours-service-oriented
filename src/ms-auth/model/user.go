@@ -1,6 +1,6 @@
 package model
 
-import userRole "ms-stakeholders/model/enum"
+import userRole "ms-auth/model/enum"
 
 type User struct {
 	Id                int `gorm:"primaryKey;autoIncrement"`

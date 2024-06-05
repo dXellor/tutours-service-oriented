@@ -10,7 +10,7 @@ services:
     networks:
       - servers
     ports:
-      - 7009:7007
+      - 8040:8040
     environment:
       DATABASE_TYPE: postgresql
       DATABASE_USER: postgres
