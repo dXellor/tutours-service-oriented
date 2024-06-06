@@ -6,10 +6,6 @@ package monolith;
 
 service Monolith {
   rpc Login (LoginRequest) returns (LoginResponse) {
-    option (google.api.http) = {
-      post: "/api/users"
-      body: "*"
-    };
   }
 }
 
