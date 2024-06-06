@@ -13,6 +13,12 @@ services:
       - 8090:8090
     depends_on:
       - monolith-grpc
+    logging: 
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+    links: 
+      - fluent-bit
 
   monolith-grpc:
     build:
@@ -31,6 +37,12 @@ services:
       DATABASE_SCHEMA: explorer
     depends_on:
       - database
+    logging: 
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+    links: 
+      - fluent-bit
 
   database:
     image: postgres:latest
@@ -46,12 +58,76 @@ services:
       - ./old-monolith/scripts/tutours-db-backup.sql:/docker-entrypoint-initdb.d/explorer-init-data.sql
       - ./ms-tours/script/tours.sql:/docker-entrypoint-initdb.d/tours.sql
       - ./ms-encounters/script/encounters.sql:/docker-entrypoint-initdb.d/encounters.sql
+    logging: 
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+    links: 
+      - fluent-bit
+
+  loki:
+    container_name: loki
+    image: grafana/loki:2.9.0
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    networks:
+      - soa
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/datasources.yaml:/etc/grafana/provisioning/datasources.yaml
+    networks:
+      - soa
+
+  prometheus:
+    image: prom/prometheus:v2.36.0
+    container_name: prometej
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - 10000:9090
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus-storage:/prometheus
+
+  renderer:
+    image: grafana/grafana-image-renderer:3.10.5
+    environment:
+      ENABLE_METRICS: "true"
+    networks:
+      - soa
+
+  fluent-bit:
+    image: grafana/fluent-bit-plugin-loki:main
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    volumes:
+      - ./monitoring/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - soa
 
 volumes:
   soadb:
     name: explorer
   mongo_tours:
   mongo_express_data:
+  grafana-storage:
+  prometheus-storage:
 
 networks:
   soa:
