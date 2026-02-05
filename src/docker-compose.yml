@@ -1,6 +1,18 @@
 version: "3.9"
 
 services:
+
+  explrer-ui:
+    build:
+      context: ./ui/Explorer
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - explorer
+    networks:
+      - soa
+
   explorer:
     build:
       context: ./old-monolith

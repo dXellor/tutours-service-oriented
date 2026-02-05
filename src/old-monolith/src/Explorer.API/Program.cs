@@ -4,8 +4,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.ConfigureSwagger(builder.Configuration);
-const string corsPolicy = "_corsPolicy";
-builder.Services.ConfigureCors(corsPolicy);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("_corsPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 builder.Services.ConfigureAuth();
 
 builder.Services.RegisterModules();
@@ -25,7 +32,7 @@ else
 }
 
 app.UseRouting();
-app.UseCors(corsPolicy);
+app.UseCors("_corsPolicy");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseAuthorization();

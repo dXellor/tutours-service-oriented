@@ -124,7 +124,7 @@ export class ProfileComponent implements OnInit {
   getProfiles(): void {
     this.service.getProfiles().subscribe({
       next: (data: PagedResults<Profile>) => {
-        this.profilesToFollow = data.results;
+        // this.profilesToFollow = data.results;
       },
       error: (err: any) => {
         console.log(err);
@@ -162,7 +162,7 @@ export class ProfileComponent implements OnInit {
   follow(followingId: number) {
     this.service.follow(followingId).subscribe({
       next: (data: PagedResults<Profile>) => {
-        // this.following = data.results;
+        this.following = data.results;
         this.getProfiles();
       },
       error: (err: any) => {
